@@ -44,7 +44,7 @@
                 <span class="text-xl font-extrabold text-slate-900">Waleed</span>
                 <span class="text-xl font-extrabold text-blue-600">Store</span>
             </a>
-            <div class="relative p-1">
+            <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
                 <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
                 <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
             </div>
@@ -98,7 +98,6 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // AAPKA PURANA FIREBASE CONFIG (CHANGE NAHI KIYA)
         const firebaseConfig = {
             apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
             authDomain: "waleed-store-f7369.firebaseapp.com",
@@ -110,19 +109,25 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // Change 2: Cart count ko sync rakhne ke liye logic
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+        updateCartCount();
+
         function getYoutubeId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // --- LOAD PRODUCTS WITH CLICK TO DETAIL LOGIC ---
         database.ref('products').on('value', (snapshot) => {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
             snapshot.forEach((child) => {
                 const p = child.val();
-                const id = child.key; // Product ki ID
+                const id = child.key;
                 
                 const imagesArray = p.images || [p.image];
                 let mediaHtml = '';
@@ -138,7 +143,6 @@
                     mediaHtml += `</div>`;
                 }
 
-                // Card par onclick lagaya taake Detail Page khule
                 grid.innerHTML += `
                     <div class="product-card bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm cursor-pointer" 
                          onclick="window.location.href='product.html?id=${id}'" 
