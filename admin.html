@@ -52,54 +52,49 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="text-xs text-slate-400 ml-2">Product Name</label>
-                    <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. Ultra Smart Watch">
+                    <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. Smart Watch">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400 ml-2">Price (Rs.)</label>
                     <input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. 4500">
                 </div>
+                <div class="md:col-span-2">
+                    <label class="text-xs text-slate-400 ml-2">Delivery Charges (Rs.)</label>
+                    <input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. 250">
+                </div>
             </div>
 
             <div class="mb-6">
-                <label class="text-xs text-slate-400 ml-2">Description (Phase 1 Ready)</label>
-                <textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-32 outline-none focus:border-blue-500" placeholder="Write full details here..."></textarea>
+                <label class="text-xs text-slate-400 ml-2">Description</label>
+                <textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-32 outline-none focus:border-blue-500" placeholder="Full details..."></textarea>
             </div>
 
             <div class="mb-6">
                 <label class="text-xs text-slate-400 ml-2">YouTube Video Link</label>
-                <input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="https://youtube.com/...">
+                <input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Link optional">
             </div>
 
             <div class="mb-8">
-                <label class="text-xs text-slate-400 ml-2">Product Images</label>
+                <label class="text-xs text-slate-400 ml-2">Images</label>
                 <div class="grid grid-cols-2 gap-3 mt-2">
                     <input type="file" class="pImg hidden" id="img1" onchange="updateLabel(1)">
                     <label for="img1" id="lbl1" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 1</label>
-                    
                     <input type="file" class="pImg hidden" id="img2" onchange="updateLabel(2)">
                     <label for="img2" id="lbl2" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 2</label>
-                    
-                    <input type="file" class="pImg hidden" id="img3" onchange="updateLabel(3)">
-                    <label for="img3" id="lbl3" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 3</label>
-                    
-                    <input type="file" class="pImg hidden" id="img4" onchange="updateLabel(4)">
-                    <label for="img4" id="lbl4" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 4</label>
                 </div>
             </div>
 
-            <button id="uploadBtn" onclick="uploadAll()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/20 transition active:scale-95">
+            <button id="uploadBtn" onclick="uploadAll()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transition active:scale-95">
                 Upload to Website
             </button>
         </div>
 
         <div id="manage-products" class="hidden-section">
-            <div id="admin-product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                </div>
+            <div id="admin-product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
 
         <div id="view-orders" class="hidden-section">
-            <div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
+            <div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
     </div>
 
@@ -123,16 +118,11 @@
             document.getElementById('add-product').classList.add('hidden-section');
             document.getElementById('view-orders').classList.add('hidden-section');
             document.getElementById('manage-products').classList.add('hidden-section');
-            
             document.getElementById(id).classList.remove('hidden-section');
             
-            const titles = {
-                'add-product': 'Add Product',
-                'view-orders': 'Customer Orders',
-                'manage-products': 'Manage Store'
-            };
+            const titles = { 'add-product': 'Add Product', 'view-orders': 'Customer Orders', 'manage-products': 'Manage Store' };
             document.getElementById('page-title').innerText = titles[id];
-            toggleSidebar();
+            if(window.innerWidth < 768) toggleSidebar();
         }
 
         function updateLabel(id) {
@@ -147,6 +137,7 @@
         async function uploadAll() {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
+            const delivery = document.getElementById('pDelivery').value || "200";
             const desc = document.getElementById('pDesc').value;
             const video = document.getElementById('pVideo').value;
             const fileInputs = document.querySelectorAll('.pImg');
@@ -170,12 +161,12 @@
                 }
 
                 await database.ref('products').push({
-                    name, price, desc, video,
+                    name, price, delivery, desc, video,
                     images: uploadedUrls,
                     date: new Date().toLocaleString()
                 });
 
-                alert("Zabardast! Product upload ho gaya.");
+                alert("Product upload ho gaya!");
                 location.reload();
             } catch (e) {
                 alert("Upload failed!");
@@ -184,34 +175,22 @@
             }
         }
 
-        // --- FIXED MANAGE PRODUCTS LOADER ---
+        // Manage Products
         database.ref('products').on('value', (snapshot) => {
             const adminList = document.getElementById('admin-product-list');
             adminList.innerHTML = "";
-            
-            if (!snapshot.exists()) {
-                adminList.innerHTML = "<p class='text-slate-500 text-center col-span-full py-10'>No products found.</p>";
-                return;
-            }
-
             snapshot.forEach(child => {
                 const p = child.val();
-                const key = child.key;
-                
-                // Handling both old and new data structures
-                const displayImg = p.images ? p.images[0] : (p.image ? p.image : 'https://placehold.co/100x100?text=No+Img');
-                const displayName = p.name || 'Unnamed Product';
-
                 adminList.innerHTML += `
                     <div class="glass-card p-4 border-l-4 border-yellow-500 flex justify-between items-center">
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <img src="${displayImg}" class="w-12 h-12 object-cover rounded-lg bg-slate-800 shrink-0">
+                        <div class="flex items-center gap-3 truncate">
+                            <img src="${p.images ? p.images[0] : ''}" class="w-12 h-12 object-cover rounded-lg bg-slate-800">
                             <div class="truncate">
-                                <h3 class="font-bold text-sm text-white truncate">${displayName}</h3>
-                                <p class="text-xs text-slate-400">Rs. ${p.price || '0'}</p>
+                                <h3 class="font-bold text-sm text-white truncate">${p.name}</h3>
+                                <p class="text-xs text-slate-400">Rs. ${p.price}</p>
                             </div>
                         </div>
-                        <button onclick="deleteProduct('${key}')" class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition shrink-0 ml-2">
+                        <button onclick="deleteProduct('${child.key}')" class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition ml-2">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>`;
@@ -219,33 +198,44 @@
         });
 
         function deleteProduct(key) {
-            if(confirm("Kya aap waqai is product ko hamesha ke liye delete karna chahte hain?")) {
-                database.ref('products/' + key).remove()
-                .then(() => alert("Product hamesha ke liye delete ho gaya!"))
-                .catch((error) => alert("Error: " + error.message));
-            }
+            if(confirm("Product delete kar dein?")) database.ref('products/' + key).remove();
         }
 
-        // Realtime Orders Loader
+        // --- UPDATED ORDERS SECTION (With Full Info & Delete) ---
         database.ref('orders').on('value', (snapshot) => {
             const list = document.getElementById('orders-list');
             list.innerHTML = "";
+            if(!snapshot.exists()) { list.innerHTML = "<p class='col-span-full text-center py-10 text-slate-500'>No orders yet.</p>"; return; }
+
             snapshot.forEach(child => {
                 const o = child.val();
+                const key = child.key;
                 list.innerHTML += `
-                    <div class="glass-card p-5 border-l-4 border-blue-500 mb-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <h3 class="font-bold text-lg text-blue-400">${o.customerName}</h3>
-                            <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400">${o.date}</span>
+                    <div class="glass-card p-5 border-l-4 border-blue-500 relative">
+                        <button onclick="deleteOrder('${key}')" class="absolute top-4 right-4 text-red-400 hover:text-red-600 p-2">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <div class="mb-4">
+                            <h3 class="font-bold text-xl text-blue-400">${o.customerName || 'No Name'}</h3>
+                            <span class="text-[10px] text-slate-500">${o.date || ''}</span>
                         </div>
-                        <p class="text-sm text-slate-300 mb-1 font-semibold">Product: ${o.productName}</p>
-                        <p class="text-sm text-slate-300 mb-3">Total: Rs. ${o.price}</p>
-                        <div class="bg-slate-900/50 p-3 rounded-lg text-xs text-slate-400 italic">
-                            "${o.message}"
+                        <div class="space-y-2 text-sm text-slate-300">
+                            <p><strong><i class="fa-solid fa-phone text-blue-500 mr-2"></i></strong> ${o.custPhone || 'N/A'}</p>
+                            <p><strong><i class="fa-solid fa-city text-blue-500 mr-2"></i></strong> ${o.custCity || 'N/A'}</p>
+                            <p><strong><i class="fa-solid fa-map-pin text-red-500 mr-2"></i></strong> ${o.custAddress || 'N/A'}</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-700">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Order Details</p>
+                            <p class="text-white font-semibold mt-1">${o.productName || 'N/A'}</p>
+                            <p class="text-blue-400 font-bold mt-1 text-lg">Rs. ${o.price || o.total || '0'}</p>
                         </div>
                     </div>`;
             });
         });
+
+        function deleteOrder(key) {
+            if(confirm("Order remove kar dein?")) database.ref('orders/' + key).remove();
+        }
     </script>
 </body>
 </html>
