@@ -52,5 +52,200 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="text-xs text-slate-400 ml-2">Product Name</label>
-                    <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500
-                        
+                    <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. Ultra Smart Watch">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 ml-2">Price (Rs.)</label>
+                    <input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. 4500">
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="text-xs text-slate-400 ml-2">Description (Phase 1 Ready)</label>
+                <textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-32 outline-none focus:border-blue-500" placeholder="Write full details here..."></textarea>
+            </div>
+
+            <div class="mb-6">
+                <label class="text-xs text-slate-400 ml-2">YouTube Video Link</label>
+                <input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="https://youtube.com/...">
+            </div>
+
+            <div class="mb-8">
+                <label class="text-xs text-slate-400 ml-2">Product Images</label>
+                <div class="grid grid-cols-2 gap-3 mt-2">
+                    <input type="file" class="pImg hidden" id="img1" onchange="updateLabel(1)">
+                    <label for="img1" id="lbl1" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 1</label>
+                    
+                    <input type="file" class="pImg hidden" id="img2" onchange="updateLabel(2)">
+                    <label for="img2" id="lbl2" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 2</label>
+                    
+                    <input type="file" class="pImg hidden" id="img3" onchange="updateLabel(3)">
+                    <label for="img3" id="lbl3" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 3</label>
+                    
+                    <input type="file" class="pImg hidden" id="img4" onchange="updateLabel(4)">
+                    <label for="img4" id="lbl4" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 4</label>
+                </div>
+            </div>
+
+            <button id="uploadBtn" onclick="uploadAll()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/20 transition active:scale-95">
+                Upload to Website
+            </button>
+        </div>
+
+        <div id="manage-products" class="hidden-section">
+            <div id="admin-product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
+        </div>
+
+        <div id="view-orders" class="hidden-section">
+            <div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
+            authDomain: "waleed-store-f7369.firebaseapp.com",
+            databaseURL: "https://waleed-store-f7369-default-rtdb.firebaseio.com/",
+            projectId: "waleed-store-f7369",
+            storageBucket: "waleed-store-f7369.appspot.com",
+            messagingSenderId: "148677610444",
+            appId: "1:148677610444:web:2a838575003504f216503c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const imgbbKey = "2d7d1d644318674d9d8dcd961cb666ae";
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+        function showSection(id) {
+            document.getElementById('add-product').classList.add('hidden-section');
+            document.getElementById('view-orders').classList.add('hidden-section');
+            document.getElementById('manage-products').classList.add('hidden-section');
+            
+            document.getElementById(id).classList.remove('hidden-section');
+            
+            const titles = {
+                'add-product': 'Add Product',
+                'view-orders': 'Customer Orders',
+                'manage-products': 'Manage Store'
+            };
+            document.getElementById('page-title').innerText = titles[id];
+            toggleSidebar();
+        }
+
+        function updateLabel(id) {
+            const input = document.getElementById('img'+id);
+            const label = document.getElementById('lbl'+id);
+            if(input.files[0]) {
+                label.classList.add('bg-blue-600/20', 'text-blue-400', 'border-blue-500');
+                label.innerHTML = `<i class="fa-solid fa-check-circle mb-2 text-xl"></i><br>Selected`;
+            }
+        }
+
+        async function uploadAll() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const desc = document.getElementById('pDesc').value;
+            const video = document.getElementById('pVideo').value;
+            const fileInputs = document.querySelectorAll('.pImg');
+            const btn = document.getElementById('uploadBtn');
+
+            if (!name || !price || !desc) return alert("Please fill Name, Price and Description!");
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader"></div> Processing...';
+
+            let uploadedUrls = [];
+            try {
+                for (let input of fileInputs) {
+                    if (input.files[0]) {
+                        const formData = new FormData();
+                        formData.append("image", input.files[0]);
+                        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, { method: "POST", body: formData });
+                        const data = await res.json();
+                        uploadedUrls.push(data.data.url);
+                    }
+                }
+
+                await database.ref('products').push({
+                    name, price, desc, video,
+                    images: uploadedUrls,
+                    date: new Date().toLocaleString()
+                });
+
+                alert("Zabardast! Product upload ho gaya.");
+                location.reload();
+            } catch (e) {
+                alert("Upload failed!");
+                btn.disabled = false;
+                btn.innerText = "Upload to Website";
+            }
+        }
+
+        // --- FIXED MANAGE PRODUCTS LOADER ---
+        database.ref('products').on('value', (snapshot) => {
+            const adminList = document.getElementById('admin-product-list');
+            adminList.innerHTML = "";
+            
+            if (!snapshot.exists()) {
+                adminList.innerHTML = "<p class='text-slate-500 text-center col-span-full py-10'>No products found.</p>";
+                return;
+            }
+
+            snapshot.forEach(child => {
+                const p = child.val();
+                const key = child.key;
+                
+                // Handling both old and new data structures
+                const displayImg = p.images ? p.images[0] : (p.image ? p.image : 'https://placehold.co/100x100?text=No+Img');
+                const displayName = p.name || 'Unnamed Product';
+
+                adminList.innerHTML += `
+                    <div class="glass-card p-4 border-l-4 border-yellow-500 flex justify-between items-center">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <img src="${displayImg}" class="w-12 h-12 object-cover rounded-lg bg-slate-800 shrink-0">
+                            <div class="truncate">
+                                <h3 class="font-bold text-sm text-white truncate">${displayName}</h3>
+                                <p class="text-xs text-slate-400">Rs. ${p.price || '0'}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteProduct('${key}')" class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition shrink-0 ml-2">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>`;
+            });
+        });
+
+        function deleteProduct(key) {
+            if(confirm("Kya aap waqai is product ko hamesha ke liye delete karna chahte hain?")) {
+                database.ref('products/' + key).remove()
+                .then(() => alert("Product hamesha ke liye delete ho gaya!"))
+                .catch((error) => alert("Error: " + error.message));
+            }
+        }
+
+        // Realtime Orders Loader
+        database.ref('orders').on('value', (snapshot) => {
+            const list = document.getElementById('orders-list');
+            list.innerHTML = "";
+            snapshot.forEach(child => {
+                const o = child.val();
+                list.innerHTML += `
+                    <div class="glass-card p-5 border-l-4 border-blue-500 mb-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-bold text-lg text-blue-400">${o.customerName}</h3>
+                            <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400">${o.date}</span>
+                        </div>
+                        <p class="text-sm text-slate-300 mb-1 font-semibold">Product: ${o.productName}</p>
+                        <p class="text-sm text-slate-300 mb-3">Total: Rs. ${o.price}</p>
+                        <div class="bg-slate-900/50 p-3 rounded-lg text-xs text-slate-400 italic">
+                            "${o.message}"
+                        </div>
+                    </div>`;
+            });
+        });
+    </script>
+</body>
+</html>
