@@ -69,22 +69,28 @@
             let deliveryTotal = 0;
 
             container.innerHTML = '';
-            cart.forEach(item => {
-                // Item price se "Rs. " hatakar number nikalna
-                const priceNum = parseInt(item.price.replace(/[^\d]/g, ''));
-                // Agar aapne har product ke liye alag delivery charges rakhe hain
-                const itemDelivery = item.deliveryCharges ? parseInt(item.deliveryCharges) : 200; // Default 200
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-400 py-4">Cart is empty</p>';
+            }
+
+            cart.forEach((item, index) => {
+                const priceNum = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
+                const itemDelivery = item.deliveryCharges ? parseInt(item.deliveryCharges) : 200;
 
                 subtotal += priceNum;
                 deliveryTotal += itemDelivery;
 
                 container.innerHTML += `
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 group">
                         <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover">
                         <div class="flex-1">
                             <h3 class="font-bold text-sm text-slate-800">${item.name}</h3>
                             <p class="text-blue-600 font-bold text-xs">${item.price}</p>
                         </div>
+                        <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600 p-2 transition">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
                     </div>`;
             });
 
@@ -93,12 +99,26 @@
             document.getElementById('grand-total').innerText = 'Rs. ' + (subtotal + deliveryTotal);
         }
 
+        // --- NAYA: Item delete karne ka function ---
+        function removeItem(index) {
+            if(confirm("Are you sure you want to remove this item?")) {
+                cart.splice(index, 1);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCheckout();
+            }
+        }
+
         function placeOrder() {
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
             const city = document.getElementById('custCity').value;
             const address = document.getElementById('custAddress').value;
             const total = document.getElementById('grand-total').innerText;
+
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
 
             if(!name || !phone || !city || !address) {
                 alert("Please fill all details!");
@@ -115,7 +135,6 @@
             cart.forEach(i => { orderText += `- ${i.name} (${i.price})%0A`; });
             orderText += `%0A*Total Amount:* ${total}`;
 
-            // localStorage clear karein order ke baad
             localStorage.removeItem('cart');
             window.location.href = `https://wa.me/923704884772?text=${orderText}`;
         }
