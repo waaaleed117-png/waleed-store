@@ -56,6 +56,8 @@
                 <span id="pPrice" class="text-xl font-extrabold text-blue-600 whitespace-nowrap ml-4"></span>
             </div>
 
+            <input type="hidden" id="pDeliveryVal" value="200">
+
             <div class="py-4 border-t border-slate-100">
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Description</h3>
                 <p id="pDesc" class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap"></p>
@@ -102,6 +104,8 @@
                     document.getElementById('pName').innerText = p.name;
                     document.getElementById('pPrice').innerText = 'Rs. ' + p.price;
                     document.getElementById('pDesc').innerText = p.desc;
+                    // NAYA: Delivery charge set karna
+                    document.getElementById('pDeliveryVal').value = p.delivery || "200";
                     
                     const images = p.images || [p.image];
                     const mainImg = document.getElementById('mainImage');
@@ -136,8 +140,10 @@
             const pName = document.getElementById('pName').innerText;
             const pPrice = document.getElementById('pPrice').innerText;
             const pImg = document.getElementById('mainImage').src;
+            // NAYA: Delivery charge uthana
+            const pDelivery = document.getElementById('pDeliveryVal').value;
 
-            const item = { name: pName, price: pPrice, img: pImg };
+            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
             cart.push(item);
             
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -152,10 +158,9 @@
             }
         }
 
-        // Change 2: Buy Now function ab seedha checkout par bhejta hai
         function directOrder() {
-            addToCart(); // Pehle cart mein save hoga
-            window.location.href = 'checkout.html'; // Phir checkout page open ho jayega
+            addToCart(); 
+            window.location.href = 'checkout.html'; 
         }
     </script>
 </body>
