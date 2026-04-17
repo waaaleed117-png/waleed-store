@@ -31,7 +31,13 @@
                 <span class="text-xl font-extrabold text-slate-900">Waleed</span>
                 <span class="text-xl font-extrabold text-blue-600">Store</span>
             </a>
-            <button onclick="history.back()" class="text-slate-800 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="flex items-center gap-4">
+                <div class="relative p-1">
+                    <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
+                </div>
+                <button onclick="history.back()" class="text-slate-800 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
         </div>
     </nav>
 
@@ -61,7 +67,7 @@
             </div>
 
             <div class="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex gap-3 z-40">
-                <button class="flex-1 bg-slate-100 text-slate-900 py-4 rounded-2xl font-bold text-sm active:scale-95 transition">Add to Cart</button>
+                <button onclick="addToCart()" class="flex-1 bg-slate-100 text-slate-900 py-4 rounded-2xl font-bold text-sm active:scale-95 transition">Add to Cart</button>
                 <button onclick="directOrder()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm buy-btn active:scale-95 transition shadow-lg shadow-blue-600/20">Buy Now</button>
             </div>
         </div>
@@ -74,7 +80,6 @@
     </footer>
 
     <script>
-        // Use the SAME Firebase Config from your index.html
         const firebaseConfig = {
             apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
             authDomain: "waleed-store-f7369.firebaseapp.com",
@@ -90,6 +95,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
 
+        // Fetch Product Data
         if (productId) {
             database.ref('products/' + productId).once('value', (snapshot) => {
                 const p = snapshot.val();
@@ -124,13 +130,36 @@
             });
         }
 
+        // --- CART SYSTEM LOGIC ---
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        updateCartUI();
+
+        function addToCart() {
+            const pName = document.getElementById('pName').innerText;
+            const pPrice = document.getElementById('pPrice').innerText;
+            const pImg = document.getElementById('mainImage').src;
+
+            const item = { name: pName, price: pPrice, img: pImg };
+            cart.push(item);
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+            alert("Product added to cart!");
+        }
+
+        function updateCartUI() {
+            const countElement = document.getElementById('cart-count');
+            if(countElement) {
+                countElement.innerText = cart.length;
+            }
+        }
+
         function directOrder() {
             const name = document.getElementById('pName').innerText;
             const price = document.getElementById('pPrice').innerText;
-            window.location.href = `index.html#contact`; // User ko wapis contact form pe le jaye ga product detail ke sath
-            // Agle phase mein hum isay mazeed smooth banayenge
+            // Immediate Redirect to Contact with Product Context
+            window.location.href = `index.html?order=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}#contact`;
         }
     </script>
 </body>
 </html>
-
