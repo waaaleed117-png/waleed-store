@@ -74,7 +74,7 @@
     <div id="orderModal" class="modal">
         <div class="bg-slate-900 w-full max-w-md rounded-3xl p-6 border border-slate-700 max-h-[90vh] overflow-y-auto relative">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 text-xl"><i class="fa-solid fa-circle-xmark"></i></button>
-            <h2 class="text-xl font-bold text-blue-400 mb-6">Order Details</h2>
+            <h2 id="modal-title" class="text-xl font-bold text-blue-400 mb-6">Details</h2>
             <div id="modal-content" class="space-y-4"></div>
         </div>
     </div>
@@ -98,8 +98,65 @@
         function showSection(id) {
             document.querySelectorAll('.main-content > div:not(.flex)').forEach(div => div.classList.add('hidden-section'));
             document.getElementById(id).classList.remove('hidden-section');
-            document.getElementById('page-title').innerText = id.replace('-', ' ').toUpperCase();
+            const titles = {'add-product': 'Add Product', 'view-orders': 'Customer Orders', 'manage-products': 'Manage Store'};
+            document.getElementById('page-title').innerText = titles[id];
             if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        // --- MANAGE PRODUCTS LOGIC ---
+        database.ref('products').on('value', (snapshot) => {
+            const adminList = document.getElementById('admin-product-list');
+            adminList.innerHTML = "";
+            snapshot.forEach(child => {
+                const p = child.val();
+                adminList.innerHTML += `
+                    <div class="glass-card p-4 border-l-4 border-blue-500 flex justify-between items-center" onclick='openEditProduct(${JSON.stringify(p)}, "${child.key}")'>
+                        <div class="truncate">
+                            <h3 class="font-bold text-sm text-white truncate">${p.name}</h3>
+                            <p class="text-xs text-slate-400">Rs. ${p.price}</p>
+                        </div>
+                        <i class="fa-solid fa-pen-to-square text-blue-400"></i>
+                    </div>`;
+            });
+        });
+
+        function openEditProduct(p, key) {
+            document.getElementById('modal-title').innerText = "Edit Product";
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="space-y-3">
+                    <input type="text" id="editName" value="${p.name}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <input type="number" id="editPrice" value="${p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <input type="number" id="editDel" value="${p.delivery || 200}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <input type="number" id="editCod" value="${p.cod_fee || 0}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
+                    <textarea id="editDesc" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none h-24">${p.desc}</textarea>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button onclick="updateProduct('${key}')" class="bg-blue-600 py-3 rounded-xl font-bold">Save Changes</button>
+                        <button onclick="deleteProduct('${key}')" class="bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('orderModal').classList.add('active');
+        }
+
+        async function updateProduct(key) {
+            const updates = {
+                name: document.getElementById('editName').value,
+                price: document.getElementById('editPrice').value,
+                delivery: document.getElementById('editDel').value,
+                cod_fee: document.getElementById('editCod').value,
+                desc: document.getElementById('editDesc').value
+            };
+            await database.ref('products/' + key).update(updates);
+            alert("Product Updated!");
+            closeModal();
+        }
+
+        function deleteProduct(key) {
+            if(confirm("Hamesha ke liye delete kar dein?")) {
+                database.ref('products/' + key).remove();
+                closeModal();
+            }
         }
 
         // --- FETCH ORDERS ---
@@ -108,79 +165,55 @@
             list.innerHTML = "";
             snapshot.forEach(child => {
                 const o = child.val();
-                const key = child.key;
                 const isAdvance = o.paymentMethod === 'advance';
-                
                 list.innerHTML += `
-                    <div class="glass-card p-5 border-l-4 ${isAdvance ? 'border-green-500' : 'border-yellow-500'}" onclick='openOrderDetails(${JSON.stringify(o)}, "${key}")'>
+                    <div class="glass-card p-5 border-l-4 ${isAdvance ? 'border-green-500' : 'border-yellow-500'}" onclick='openOrderDetails(${JSON.stringify(o)}, "${child.key}")'>
                         <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="font-bold text-lg text-white">${o.customerName}</h3>
-                                <p class="text-xs text-slate-400">${o.customerCity}</p>
-                            </div>
+                            <div><h3 class="font-bold text-lg text-white">${o.customerName}</h3><p class="text-xs text-slate-400">${o.customerCity}</p></div>
                             <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-500">${o.date.split(',')[0]}</span>
                         </div>
-                        <div class="mt-4 flex justify-between items-center">
-                            <span class="text-[10px] font-bold uppercase ${isAdvance ? 'text-green-400' : 'text-yellow-400'}">${o.paymentMethod}</span>
-                            <span class="text-blue-400 font-bold">${o.price}</span>
-                        </div>
+                        <div class="mt-4 flex justify-between items-center"><span class="text-[10px] font-bold uppercase ${isAdvance ? 'text-green-400' : 'text-yellow-400'}">${o.paymentMethod}</span><span class="text-blue-400 font-bold">${o.price}</span></div>
                     </div>`;
             });
         });
 
         function openOrderDetails(o, key) {
-            const modal = document.getElementById('orderModal');
+            document.getElementById('modal-title').innerText = "Order Details";
             const content = document.getElementById('modal-content');
             const isAdvance = o.paymentMethod === 'advance';
-            
             content.innerHTML = `
                 <div class="space-y-4">
-                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-2">Customer Info</p>
-                        <p class="text-sm"><b>Name:</b> ${o.customerName}</p>
-                        <p class="text-sm"><b>Phone:</b> <a href="tel:${o.customerPhone}" class="text-blue-400">${o.customerPhone}</a></p>
-                        <p class="text-sm"><b>City:</b> ${o.customerCity}</p>
-                        <p class="text-sm"><b>Address:</b> ${o.customerAddress}</p>
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5 text-sm">
+                        <p><b>Name:</b> ${o.customerName}</p><p><b>Phone:</b> ${o.customerPhone}</p><p><b>City:</b> ${o.customerCity}</p><p><b>Address:</b> ${o.customerAddress}</p>
                     </div>
-
                     <div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-2">Order Info</p>
-                        <p class="text-xs text-white leading-relaxed"><b>Products:</b> ${o.productName}</p>
-                        <p class="text-sm mt-2 text-blue-400"><b>Grand Total:</b> ${o.price}</p>
-                        <p class="text-sm font-bold ${isAdvance ? 'text-green-400' : 'text-yellow-400'}"><b>Method:</b> ${o.paymentMethod.toUpperCase()}</p>
-                        <div class="mt-2 pt-2 border-t border-white/5 text-right">
-                            <p class="text-xs font-bold ${isAdvance ? 'text-green-500' : 'text-red-500'}">
-                                ${isAdvance ? 'AMOUNT COLLECTED: Rs. 0 DUE' : 'COLLECT CASH: ' + o.price}
-                            </p>
-                        </div>
+                        <p class="text-xs"><b>Products:</b> ${o.productName}</p>
+                        <p class="text-sm mt-2 text-blue-400 font-bold">Total: ${o.price}</p>
+                        <p class="text-xs font-bold mt-2 ${isAdvance ? 'text-green-500' : 'text-red-500'}">${isAdvance ? 'PAID: Rs. 0 DUE' : 'COLLECT: ' + o.price}</p>
                     </div>
-
-                    ${o.screenshot && o.screenshot !== "No Screenshot (COD)" ? `
-                        <div class="space-y-2">
-                            <p class="text-[10px] text-slate-500 font-bold uppercase">Payment Screenshot</p>
-                            <a href="${o.screenshot}" target="_blank">
-                                <img src="${o.screenshot}" class="w-full rounded-2xl border border-slate-700 shadow-xl">
-                            </a>
-                        </div>
-                    ` : ''}
-
-                    <button onclick="deleteOrder('${key}')" class="w-full bg-red-500/10 text-red-500 py-3 rounded-xl font-bold text-sm hover:bg-red-500 hover:text-white transition">
-                        <i class="fa-solid fa-trash-can mr-2"></i> Delete Order Permanentally
-                    </button>
-                </div>
-            `;
-            modal.classList.add('active');
+                    ${o.screenshot && o.screenshot !== "No Screenshot (COD)" ? `<a href="${o.screenshot}" target="_blank"><img src="${o.screenshot}" class="w-full rounded-2xl border border-slate-700 shadow-xl"></a>` : ''}
+                    <button onclick="deleteOrder('${key}')" class="w-full bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete Order</button>
+                </div>`;
+            document.getElementById('orderModal').classList.add('active');
         }
 
-        function deleteOrder(key) {
-            if(confirm("Are you sure? Yeh order hamesha ke liye delete ho jayega.")) {
-                database.ref('orders/' + key).remove();
-                closeModal();
-            }
+        function deleteOrder(key) { if(confirm("Delete order?")) { database.ref('orders/' + key).remove(); closeModal(); } }
+
+        async function uploadAll() {
+            const btn = document.getElementById('uploadBtn');
+            const data = {
+                name: document.getElementById('pName').value,
+                price: document.getElementById('pPrice').value,
+                delivery: document.getElementById('pDelivery').value,
+                cod_fee: document.getElementById('pCod').value,
+                desc: document.getElementById('pDesc').value,
+                date: new Date().toLocaleString()
+            };
+            if(!data.name || !data.price) return alert("Details missing!");
+            btn.disabled = true; btn.innerHTML = '<div class="loader"></div>';
+            await database.ref('products').push(data);
+            alert("Uploaded!"); location.reload();
         }
-        
-        // --- (Baqi Purana Logic: uploadAll, updateLabel, deleteProduct yahan end par add kar dein) ---
-        async function uploadAll() { /* ... same as your previous code ... */ }
     </script>
 </body>
 </html>
