@@ -6,137 +6,276 @@
     <title>Checkout | Waleed Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .payment-card { transition: 0.3s; border: 2px solid #f1f5f9; cursor: pointer; }
+        .payment-radio:checked + .payment-card { border-color: #2563eb; background: #eff6ff; }
+        .upload-dashed { border: 2px dashed #cbd5e1; transition: 0.3s; }
+        .upload-dashed:hover { border-color: #2563eb; background: #f8fafc; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body class="bg-slate-50 pb-24">
+<body class="bg-slate-50 pb-32">
 
-    <nav class="p-4 bg-white border-b border-slate-100 flex items-center gap-4">
+    <nav class="p-4 bg-white border-b border-slate-100 flex items-center gap-4 sticky top-0 z-50">
         <button onclick="history.back()"><i class="fa-solid fa-arrow-left text-xl text-slate-800"></i></button>
         <h1 class="text-xl font-bold text-slate-900">Checkout</h1>
     </nav>
 
-    <div class="p-4 space-y-6">
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="font-bold text-slate-800 mb-4">Your Items</h2>
+    <div class="p-4 space-y-6 max-w-lg mx-auto">
+        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+            <h2 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-blue-600"></i> Your Items
+            </h2>
             <div id="checkout-items" class="space-y-4"></div>
             
-            <div class="mt-4 pt-4 border-t border-slate-100 space-y-2 text-sm">
+            <div class="mt-6 pt-4 border-t border-slate-100 space-y-3 text-sm">
                 <div class="flex justify-between text-slate-500">
                     <span>Subtotal</span>
-                    <span id="subtotal">Rs. 0</span>
+                    <span id="subtotal" class="font-semibold text-slate-800">Rs. 0</span>
                 </div>
                 <div class="flex justify-between text-slate-500">
                     <span>Delivery Charges</span>
-                    <span id="delivery-total">Rs. 0</span>
+                    <span id="delivery-total" class="font-semibold text-slate-800">Rs. 0</span>
                 </div>
-                <div class="flex justify-between font-bold text-lg text-blue-600 pt-2">
-                    <span>Total</span>
+                <div id="cod-row" class="flex justify-between text-blue-600 font-bold hidden">
+                    <span>COD Service Fee</span>
+                    <span id="cod-total-display">Rs. 0</span>
+                </div>
+                <div class="flex justify-between font-extrabold text-xl text-slate-900 pt-2 border-t border-dashed mt-2">
+                    <span>Grand Total</span>
                     <span id="grand-total">Rs. 0</span>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-            <h2 class="font-bold text-slate-800">Shipping Information</h2>
-            <input type="text" id="custName" placeholder="Full Name" class="w-full p-4 bg-slate-50 rounded-xl outline-none border border-transparent focus:border-blue-500">
-            <input type="number" id="custPhone" placeholder="WhatsApp Number" class="w-full p-4 bg-slate-50 rounded-xl outline-none border border-transparent focus:border-blue-500">
-            
-            <input type="text" id="custCity" placeholder="City" class="w-full p-4 bg-slate-50 rounded-xl outline-none border border-transparent focus:border-blue-500">
-            
-            <textarea id="custAddress" placeholder="Full Address (House No, Street...)" class="w-full p-4 bg-slate-50 rounded-xl outline-none border border-transparent focus:border-blue-500 h-24"></textarea>
+        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-4">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-location-dot text-blue-600"></i> Shipping Details
+            </h2>
+            <input type="text" id="custName" placeholder="Full Name" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500 transition">
+            <input type="number" id="custPhone" placeholder="WhatsApp Number (e.g. 0300...)" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500 transition">
+            <input type="text" id="custCity" placeholder="City Name" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500 transition">
+            <textarea id="custAddress" placeholder="Complete Address (House #, Street, Area...)" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500 h-24 transition"></textarea>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="font-bold text-slate-800 mb-3">Payment Method</h2>
-            <div class="flex items-center p-3 border-2 border-blue-600 rounded-xl bg-blue-50">
-                <i class="fa-solid fa-truck text-blue-600 mr-3"></i>
-                <span class="font-semibold text-blue-600">Cash on Delivery</span>
-                <i class="fa-solid fa-circle-check ml-auto text-blue-600"></i>
+        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-4">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-credit-card text-blue-600"></i> Payment Method
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-3">
+                <label class="relative">
+                    <input type="radio" name="payMethod" value="advance" class="payment-radio hidden" checked onchange="togglePaymentUI()">
+                    <div class="payment-card p-4 rounded-2xl flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Advance Payment</p>
+                                <p class="text-[10px] text-green-600 font-bold">Fast Delivery & No Extra Fees</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-circle-check text-blue-600 check-icon"></i>
+                    </div>
+                </label>
+
+                <label class="relative">
+                    <input type="radio" name="payMethod" value="cod" class="payment-radio hidden" onchange="togglePaymentUI()">
+                    <div class="payment-card p-4 rounded-2xl flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-truck-fast"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Cash on Delivery</p>
+                                <p class="text-[10px] text-slate-500">Pay when you receive</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-circle-check text-slate-200 check-icon"></i>
+                    </div>
+                </label>
             </div>
-            <p class="text-[10px] text-slate-400 mt-2">Online Payment (Phase 3) coming soon!</p>
+
+            <div id="advance-details" class="mt-4 space-y-4 pt-4 border-t border-slate-50">
+                <div class="bg-blue-600 p-4 rounded-2xl text-white space-y-3 shadow-lg shadow-blue-200">
+                    <div class="flex items-center justify-between border-b border-white/20 pb-2">
+                        <span class="text-xs font-bold uppercase opacity-80">Payable Accounts</span>
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span><i class="fa-solid fa-mobile-screen-button mr-2"></i><b>JazzCash / EasyPaisa</b></span>
+                            <span class="font-mono">03704884772</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span><i class="fa-solid fa-building-columns mr-2"></i><b>NayaPay (Bank)</b></span>
+                            <span class="font-mono text-[11px]">03346588665</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-1">
+                            <span class="text-xs opacity-90">Account Name:</span>
+                            <span class="font-bold">Waleed Ahmad</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upload-dashed p-6 rounded-2xl text-center relative group">
+                    <input type="file" id="ssUpload" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewSS()">
+                    <div id="upload-placeholder">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-2"></i>
+                        <p class="text-xs font-bold text-slate-700">Upload Payment Screenshot</p>
+                        <p class="text-[9px] text-slate-400 mt-1 uppercase tracking-tighter text-blue-600 font-bold">Zaroori: Payment ke baad screen shot yahan lagayen</p>
+                    </div>
+                    <div id="preview-area" class="hidden">
+                        <p class="text-[10px] text-green-600 font-bold mb-1"><i class="fa-solid fa-check-double mr-1"></i> Screenshot Selected!</p>
+                        <img id="ssPreview" class="h-20 mx-auto rounded-lg border border-slate-200 shadow-sm">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 w-full p-4 bg-white border-t border-slate-100 z-50">
-        <button onclick="placeOrder()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition">Confirm Order</button>
+    <div class="fixed bottom-0 left-0 w-full p-4 bg-white/90 backdrop-blur-md border-t border-slate-100 z-50">
+        <div class="max-w-lg mx-auto">
+            <button id="orderBtn" onclick="placeOrder()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-xl shadow-blue-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+                Confirm & Place Order
+            </button>
+        </div>
     </div>
 
     <script>
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        
+        let baseTotal = 0;
+        let codTotalFee = 0;
+        const imgbbKey = "2d7d1d644318674d9d8dcd961cb666ae"; // ImgBB for Screenshot
+
         function loadCheckout() {
             const container = document.getElementById('checkout-items');
             let subtotal = 0;
             let deliveryTotal = 0;
+            codTotalFee = 0;
 
             container.innerHTML = '';
 
-            if (cart.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-400 py-4">Cart is empty</p>';
-            }
-
             cart.forEach((item, index) => {
                 const priceNum = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
-                const itemDelivery = item.deliveryCharges ? parseInt(item.deliveryCharges) : 200;
+                const itemDelivery = parseInt(item.deliveryCharges) || 0;
+                const itemCod = parseInt(item.codFee) || 0;
 
                 subtotal += priceNum;
                 deliveryTotal += itemDelivery;
+                codTotalFee += itemCod;
 
                 container.innerHTML += `
-                    <div class="flex items-center gap-4 group">
-                        <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.img}" class="w-14 h-14 rounded-xl object-cover border border-slate-100">
                         <div class="flex-1">
-                            <h3 class="font-bold text-sm text-slate-800">${item.name}</h3>
-                            <p class="text-blue-600 font-bold text-xs">${item.price}</p>
+                            <h3 class="font-bold text-[13px] text-slate-800 leading-tight">${item.name}</h3>
+                            <p class="text-blue-600 font-extrabold text-xs mt-1">Rs. ${priceNum}</p>
                         </div>
-                        <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600 p-2 transition">
-                            <i class="fa-solid fa-trash-can"></i>
+                        <button onclick="removeItem(${index})" class="text-slate-300 hover:text-red-500 p-2 transition">
+                            <i class="fa-solid fa-circle-xmark"></i>
                         </button>
                     </div>`;
             });
 
+            baseTotal = subtotal + deliveryTotal;
             document.getElementById('subtotal').innerText = 'Rs. ' + subtotal;
             document.getElementById('delivery-total').innerText = 'Rs. ' + deliveryTotal;
-            document.getElementById('grand-total').innerText = 'Rs. ' + (subtotal + deliveryTotal);
-        }
-
-        // --- NAYA: Item delete karne ka function ---
-        function removeItem(index) {
-            if(confirm("Are you sure you want to remove this item?")) {
-                cart.splice(index, 1);
-                localStorage.setItem('cart', JSON.stringify(cart));
-                loadCheckout();
-            }
-        }
-
-        function placeOrder() {
-            const name = document.getElementById('custName').value;
-            const phone = document.getElementById('custPhone').value;
-            const city = document.getElementById('custCity').value;
-            const address = document.getElementById('custAddress').value;
-            const total = document.getElementById('grand-total').innerText;
-
-            if (cart.length === 0) {
-                alert("Your cart is empty!");
-                return;
-            }
-
-            if(!name || !phone || !city || !address) {
-                alert("Please fill all details!");
-                return;
-            }
-
-            let orderText = `*New Order - Waleed Store*%0A%0A`;
-            orderText += `*Name:* ${name}%0A`;
-            orderText += `*Phone:* ${phone}%0A`;
-            orderText += `*City:* ${city}%0A`;
-            orderText += `*Address:* ${address}%0A%0A`;
-            orderText += `*Items:*%0A`;
+            document.getElementById('cod-total-display').innerText = '+ Rs. ' + codTotalFee;
             
-            cart.forEach(i => { orderText += `- ${i.name} (${i.price})%0A`; });
-            orderText += `%0A*Total Amount:* ${total}`;
+            togglePaymentUI(); // Refresh totals based on selection
+        }
 
-            localStorage.removeItem('cart');
-            window.location.href = `https://wa.me/923704884772?text=${orderText}`;
+        function togglePaymentUI() {
+            const method = document.querySelector('input[name="payMethod"]:checked').value;
+            const advanceBox = document.getElementById('advance-details');
+            const codRow = document.getElementById('cod-row');
+            const grandTotalDisplay = document.getElementById('grand-total');
+
+            if(method === 'cod') {
+                advanceBox.classList.add('hidden');
+                codRow.classList.remove('hidden');
+                grandTotalDisplay.innerText = 'Rs. ' + (baseTotal + codTotalFee);
+            } else {
+                advanceBox.classList.remove('hidden');
+                codRow.classList.add('hidden');
+                grandTotalDisplay.innerText = 'Rs. ' + baseTotal;
+            }
+        }
+
+        function previewSS() {
+            const file = document.getElementById('ssUpload').files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('ssPreview').src = e.target.result;
+                    document.getElementById('upload-placeholder').classList.add('hidden');
+                    document.getElementById('preview-area').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            if(cart.length === 0) window.location.href = 'index.html';
+            else loadCheckout();
+        }
+
+        async function placeOrder() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const city = document.getElementById('custCity').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const method = document.querySelector('input[name="payMethod"]:checked').value;
+            const ssFile = document.getElementById('ssUpload').files[0];
+            const btn = document.getElementById('orderBtn');
+
+            if(!name || !phone || !city || !address) return alert("Meharbani karke mukammal maloomat bharen!");
+            if(method === 'advance' && !ssFile) return alert("Advance payment select ki hai, screenshot upload karna zaroori hai!");
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader"></div> Processing Order...';
+
+            let ssUrl = "No Screenshot (COD)";
+            
+            try {
+                // If screenshot exists, upload to ImgBB
+                if(ssFile && method === 'advance') {
+                    const formData = new FormData();
+                    formData.append("image", ssFile);
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, { method: "POST", body: formData });
+                    const data = await res.json();
+                    ssUrl = data.data.url;
+                }
+
+                const totalFinal = document.getElementById('grand-total').innerText;
+
+                // 1. WhatsApp Message tayyar karein
+                let waText = `*NEW ORDER - WALEED STORE*%0A%0A`;
+                waText += `*Customer:* ${name}%0A`;
+                waText += `*Phone:* ${phone}%0A`;
+                waText += `*Address:* ${address}, ${city}%0A`;
+                waText += `*Method:* ${method.toUpperCase()}%0A`;
+                waText += `*Total Bill:* ${totalFinal}%0A%0A`;
+                waText += `*Items:*%0A`;
+                cart.forEach(i => { waText += `- ${i.name}%0A`; });
+                
+                if(method === 'advance') waText += `%0A*Payment SS:* ${ssUrl}`;
+
+                // 2. Clear Cart and Redirect
+                localStorage.removeItem('cart');
+                window.location.href = `https://wa.me/923704884772?text=${waText}`;
+
+            } catch(e) {
+                alert("Order processing mein masla aya, dobara try karen.");
+                btn.disabled = false;
+                btn.innerHTML = 'Confirm & Place Order';
+            }
         }
 
         loadCheckout();
