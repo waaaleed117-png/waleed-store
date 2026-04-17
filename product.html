@@ -14,9 +14,29 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
         body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
-        .main-img-container { background: #f8fafc; border-radius: 2rem; overflow: hidden; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9; }
-        .main-img { max-height: 100%; max-width: 100%; object-fit: contain; }
-        .thumb-img { width: 70px; height: 70px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background: #f1f5f9; }
+        
+        /* Swipe Slider Logic */
+        .slider-container { 
+            display: flex; 
+            overflow-x: auto; 
+            scroll-snap-type: x mandatory; 
+            scroll-behavior: smooth; 
+            -webkit-overflow-scrolling: touch;
+            aspect-ratio: 1/1;
+            background: #f8fafc;
+        }
+        .slider-container::-webkit-scrollbar { display: none; }
+        .slide { 
+            min-width: 100%; 
+            scroll-snap-align: center; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .slide img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .slide iframe { width: 100%; height: 100%; border: none; }
+
+        .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background: #f1f5f9; flex-shrink: 0; }
         .thumb-img.active { border-color: #2563eb; transform: scale(1.05); }
         .buy-btn { animation: pulse-ring 2s infinite; }
         @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
@@ -42,12 +62,11 @@
     </nav>
 
     <div class="container mx-auto px-4 py-6">
-        <div class="mb-8">
-            <div class="main-img-container shadow-sm mb-4">
-                <img id="mainImage" src="" class="main-img">
+        <div class="mb-6">
+            <div id="imageSlider" class="slider-container rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
             </div>
-            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-2">
-                </div>
+            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-1">
+            </div>
         </div>
 
         <div class="space-y-4">
@@ -61,11 +80,6 @@
             <div class="py-4 border-t border-slate-100">
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Description</h3>
                 <p id="pDesc" class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap"></p>
-            </div>
-
-            <div id="videoSection" class="hidden py-4">
-                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Product Video</h3>
-                <div id="videoFrame" class="rounded-2xl overflow-hidden shadow-lg aspect-video bg-black"></div>
             </div>
 
             <div class="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex gap-3 z-40">
@@ -104,31 +118,54 @@
                     document.getElementById('pName').innerText = p.name;
                     document.getElementById('pPrice').innerText = 'Rs. ' + p.price;
                     document.getElementById('pDesc').innerText = p.desc;
-                    // NAYA: Delivery charge set karna
                     document.getElementById('pDeliveryVal').value = p.delivery || "200";
                     
                     const images = p.images || [p.image];
-                    const mainImg = document.getElementById('mainImage');
-                    mainImg.src = images[0];
-
+                    const slider = document.getElementById('imageSlider');
                     const thumbContainer = document.getElementById('thumbContainer');
+
+                    // 1. Add Images to Slider
                     images.forEach((img, index) => {
+                        const slide = document.createElement('div');
+                        slide.className = 'slide';
+                        slide.innerHTML = `<img src="${img}">`;
+                        slider.appendChild(slide);
+
                         const thumb = document.createElement('img');
                         thumb.src = img;
                         thumb.className = `thumb-img ${index === 0 ? 'active' : ''}`;
                         thumb.onclick = () => {
-                            mainImg.src = img;
-                            document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
-                            thumb.classList.add('active');
+                            slide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
                         };
                         thumbContainer.appendChild(thumb);
                     });
 
+                    // 2. Add Video as LAST slide
                     if (p.video) {
                         const vidId = p.video.includes('v=') ? p.video.split('v=')[1].split('&')[0] : p.video.split('/').pop();
-                        document.getElementById('videoSection').classList.remove('hidden');
-                        document.getElementById('videoFrame').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
+                        const videoSlide = document.createElement('div');
+                        videoSlide.className = 'slide';
+                        videoSlide.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}" allowfullscreen></iframe>`;
+                        slider.appendChild(videoSlide);
+
+                        // Video Thumbnail (Play Icon)
+                        const videoThumb = document.createElement('div');
+                        videoThumb.className = 'thumb-img flex items-center justify-center bg-slate-800 text-white';
+                        videoThumb.innerHTML = `<i class="fa-solid fa-play"></i>`;
+                        videoThumb.onclick = () => {
+                            videoSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                        };
+                        thumbContainer.appendChild(videoThumb);
                     }
+
+                    // Sync thumbnails with scroll
+                    slider.addEventListener('scroll', () => {
+                        const index = Math.round(slider.scrollLeft / slider.clientWidth);
+                        const allThumbs = document.querySelectorAll('.thumb-img');
+                        allThumbs.forEach((t, i) => {
+                            t.classList.toggle('active', i === index);
+                        });
+                    });
                 }
             });
         }
@@ -139,16 +176,14 @@
         function addToCart() {
             const pName = document.getElementById('pName').innerText;
             const pPrice = document.getElementById('pPrice').innerText;
-            const pImg = document.getElementById('mainImage').src;
-            // NAYA: Delivery charge uthana
+            const firstImg = document.querySelector('.slide img');
+            const pImg = firstImg ? firstImg.src : "";
             const pDelivery = document.getElementById('pDeliveryVal').value;
 
             const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
             cart.push(item);
-            
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartUI();
-            alert("Product added to cart!");
         }
 
         function updateCartUI() {
@@ -159,7 +194,14 @@
         }
 
         function directOrder() {
-            addToCart(); 
+            const pName = document.getElementById('pName').innerText;
+            const pPrice = document.getElementById('pPrice').innerText;
+            const firstImg = document.querySelector('.slide img');
+            const pImg = firstImg ? firstImg.src : "";
+            const pDelivery = document.getElementById('pDeliveryVal').value;
+
+            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
+            localStorage.setItem('cart', JSON.stringify([item]));
             window.location.href = 'checkout.html'; 
         }
     </script>
