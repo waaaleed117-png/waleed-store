@@ -23,6 +23,7 @@
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden-section { display: none; }
+        label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-left: 4px; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -52,44 +53,35 @@
         </div>
 
         <div id="add-product" class="glass-card p-6 max-w-2xl mx-auto shadow-2xl cursor-default hover:transform-none">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Product Name">
-                <input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Price">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div><label>Product Name</label><input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter name"></div>
+                <div><label>Price</label><input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter price"></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Delivery Charges" value="200">
-                <input type="number" id="pCod" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="COD Fee" value="0">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div><label>Delivery Charges</label><input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="200"></div>
+                <div><label>COD Fee</label><input type="number" id="pCod" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="0"></div>
             </div>
-            <textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-24 mb-4 outline-none" placeholder="Description"></textarea>
-            <input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none mb-6" placeholder="YouTube Video Link">
+            <div class="mb-4"><label>Description</label><textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-24 outline-none" placeholder="Product description..."></textarea></div>
+            <div class="mb-6"><label>YouTube Video Link</label><input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="https://youtube.com/..."></div>
             
+            <label>Upload Images (Max 4)</label>
             <div class="grid grid-cols-2 gap-3 mb-8">
-                <input type="file" class="pImg hidden" id="img1" onchange="updateLabel(1)">
-                <label for="img1" id="lbl1" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 1</label>
-                <input type="file" class="pImg hidden" id="img2" onchange="updateLabel(2)">
-                <label for="img2" id="lbl2" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 2</label>
-                <input type="file" class="pImg hidden" id="img3" onchange="updateLabel(3)">
-                <label for="img3" id="lbl3" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 3</label>
-                <input type="file" class="pImg hidden" id="img4" onchange="updateLabel(4)">
-                <label for="img4" id="lbl4" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 4</label>
+                <input type="file" class="pImg hidden" id="img1" onchange="updateLabel(1)"><label for="img1" id="lbl1" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 1</label>
+                <input type="file" class="pImg hidden" id="img2" onchange="updateLabel(2)"><label for="img2" id="lbl2" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 2</label>
+                <input type="file" class="pImg hidden" id="img3" onchange="updateLabel(3)"><label for="img3" id="lbl3" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 3</label>
+                <input type="file" class="pImg hidden" id="img4" onchange="updateLabel(4)"><label for="img4" id="lbl4" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 4</label>
             </div>
-
             <button id="uploadBtn" onclick="uploadAll()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">Upload Product</button>
         </div>
 
-        <div id="manage-products" class="hidden-section">
-            <div id="admin-product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
-
-        <div id="view-orders" class="hidden-section">
-            <div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
+        <div id="manage-products" class="hidden-section"><div id="admin-product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+        <div id="view-orders" class="hidden-section"><div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
     </div>
 
     <div id="orderModal" class="modal">
         <div class="bg-slate-900 w-full max-w-md rounded-3xl p-6 border border-slate-700 max-h-[90vh] overflow-y-auto relative">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 text-xl"><i class="fa-solid fa-circle-xmark"></i></button>
-            <h2 id="modal-title" class="text-xl font-bold text-blue-400 mb-6 text-center">Details</h2>
+            <h2 id="modal-title" class="text-xl font-bold text-blue-400 mb-6 text-center uppercase tracking-wider">Details</h2>
             <div id="modal-content" class="space-y-4"></div>
         </div>
     </div>
@@ -125,18 +117,13 @@
             label.innerHTML = `<i class="fa-solid fa-check-circle mb-1"></i><br>Ready`;
         }
 
-        // --- MANAGE PRODUCTS ---
         database.ref('products').on('value', (snapshot) => {
             const list = document.getElementById('admin-product-list');
             list.innerHTML = "";
             snapshot.forEach(child => {
                 const p = child.val();
                 const displayImg = p.images ? p.images[0] : 'https://placehold.co/100x100';
-                list.innerHTML += `
-                    <div class="glass-card p-4 flex gap-3 items-center" onclick='openEditProduct(${JSON.stringify(p)}, "${child.key}")'>
-                        <img src="${displayImg}" class="w-12 h-12 object-cover rounded-lg">
-                        <div class="truncate"><h3 class="font-bold text-sm text-white truncate">${p.name}</h3><p class="text-xs text-slate-400">Rs. ${p.price}</p></div>
-                    </div>`;
+                list.innerHTML += `<div class="glass-card p-4 flex gap-3 items-center" onclick='openEditProduct(${JSON.stringify(p)}, "${child.key}")'><img src="${displayImg}" class="w-12 h-12 object-cover rounded-lg"><div><h3 class="font-bold text-sm text-white">${p.name}</h3><p class="text-xs text-slate-400">Rs. ${p.price}</p></div></div>`;
             });
         });
 
@@ -145,46 +132,44 @@
             const content = document.getElementById('modal-content');
             content.innerHTML = `
                 <div class="space-y-3">
-                    <label class="text-[10px] text-slate-500 uppercase font-bold ml-1">Product Name</label>
-                    <input type="text" id="eName" value="${p.name}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
-                    <label class="text-[10px] text-slate-500 uppercase font-bold ml-1">Price</label>
-                    <input type="number" id="ePrice" value="${p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none">
-                    <label class="text-[10px] text-slate-500 uppercase font-bold ml-1">Description</label>
-                    <textarea id="eDesc" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 h-24 outline-none">${p.desc}</textarea>
-                    <div class="grid grid-cols-2 gap-2 mt-4">
+                    <div><label>Product Name</label><input type="text" id="eName" value="${p.name}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label>Price</label><input type="number" id="ePrice" value="${p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                        <div><label>Delivery</label><input type="number" id="eDel" value="${p.delivery || 200}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                    </div>
+                    <div><label>COD Fee</label><input type="number" id="eCod" value="${p.cod_fee || 0}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                    <div><label>Description</label><textarea id="eDesc" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 h-24 outline-none">${p.desc}</textarea></div>
+                    <div><label>YouTube Link</label><input type="text" id="eVideo" value="${p.video || ''}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                    <div class="grid grid-cols-2 gap-2 pt-4">
                         <button onclick="updateProduct('${key}')" class="bg-blue-600 py-3 rounded-xl font-bold">Save Changes</button>
-                        <button onclick="deleteProduct('${key}')" class="bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete Product</button>
+                        <button onclick="deleteProduct('${key}')" class="bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete</button>
                     </div>
                 </div>`;
             document.getElementById('orderModal').classList.add('active');
         }
 
         async function updateProduct(key) {
-            const updates = { name: document.getElementById('eName').value, price: document.getElementById('ePrice').value, desc: document.getElementById('eDesc').value };
+            const updates = {
+                name: document.getElementById('eName').value,
+                price: document.getElementById('ePrice').value,
+                delivery: document.getElementById('eDel').value,
+                cod_fee: document.getElementById('eCod').value,
+                desc: document.getElementById('eDesc').value,
+                video: document.getElementById('eVideo').value
+            };
             await database.ref('products/' + key).update(updates);
-            alert("Updated!"); closeModal();
+            alert("Success!"); closeModal();
         }
 
         function deleteProduct(key) { if(confirm("Confirm Delete?")) { database.ref('products/' + key).remove(); closeModal(); } }
 
-        // --- FETCH ORDERS ---
         database.ref('orders').on('value', (snapshot) => {
             const list = document.getElementById('orders-list');
             list.innerHTML = "";
             snapshot.forEach(child => {
                 const o = child.val();
                 const isAdvance = o.paymentMethod === 'advance';
-                list.innerHTML += `
-                    <div class="glass-card p-5 border-l-4 ${isAdvance ? 'border-green-500' : 'border-yellow-500'}" onclick='openOrderDetails(${JSON.stringify(o)}, "${child.key}")'>
-                        <div class="flex justify-between items-start">
-                            <div><h3 class="font-bold text-white">${o.customerName}</h3><p class="text-xs text-slate-400">${o.customerCity}</p></div>
-                            <span class="text-[10px] text-slate-500">${o.date.split(',')[0]}</span>
-                        </div>
-                        <div class="mt-4 flex justify-between items-center font-bold text-sm">
-                            <span class="${isAdvance ? 'text-green-400' : 'text-yellow-400'} uppercase">${o.paymentMethod}</span>
-                            <span class="text-blue-400">${o.price}</span>
-                        </div>
-                    </div>`;
+                list.innerHTML += `<div class="glass-card p-5 border-l-4 ${isAdvance ? 'border-green-500' : 'border-yellow-500'}" onclick='openOrderDetails(${JSON.stringify(o)}, "${child.key}")'><div class="flex justify-between items-start"><div><h3 class="font-bold text-white">${o.customerName}</h3><p class="text-xs text-slate-400">${o.customerCity}</p></div><span class="text-[10px] text-slate-500">${o.date.split(',')[0]}</span></div><div class="mt-4 flex justify-between items-center font-bold text-sm"><span class="${isAdvance ? 'text-green-400' : 'text-yellow-400'} uppercase">${o.paymentMethod}</span><span class="text-blue-400">${o.price}</span></div></div>`;
             });
         });
 
@@ -192,24 +177,12 @@
             document.getElementById('modal-title').innerText = "Order Details";
             const content = document.getElementById('modal-content');
             const isAdvance = o.paymentMethod === 'advance';
-            content.innerHTML = `
-                <div class="space-y-4">
-                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5 text-sm">
-                        <p><b>Customer:</b> ${o.customerName}</p><p><b>Phone:</b> ${o.customerPhone}</p><p><b>Address:</b> ${o.customerAddress}, ${o.customerCity}</p>
-                    </div>
-                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5 text-sm">
-                        <p class="text-blue-400 font-bold mb-1">Total Bill: ${o.price}</p>
-                        <p class="font-bold ${isAdvance ? 'text-green-500' : 'text-red-500'}">${isAdvance ? 'PAID - COLLECT 0 RS' : 'COLLECT: ' + o.price}</p>
-                    </div>
-                    ${o.screenshot && o.screenshot !== "No Screenshot (COD)" ? `<img src="${o.screenshot}" class="w-full rounded-2xl border border-slate-700">` : ''}
-                    <button onclick="deleteOrder('${key}')" class="w-full bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete Order</button>
-                </div>`;
+            content.innerHTML = `<div class="space-y-4"><div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5 text-sm"><p><b>Customer:</b> ${o.customerName}</p><p><b>Phone:</b> ${o.customerPhone}</p><p><b>Address:</b> ${o.customerAddress}, ${o.customerCity}</p></div><div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5 text-sm"><p class="text-blue-400 font-bold mb-1">Total Bill: ${o.price}</p><p class="font-bold ${isAdvance ? 'text-green-500' : 'text-red-500'}">${isAdvance ? 'PAID - COLLECT 0 RS' : 'COLLECT: ' + o.price}</p></div>${o.screenshot && o.screenshot !== "No Screenshot (COD)" ? `<img src="${o.screenshot}" class="w-full rounded-2xl border border-slate-700">` : ''}<button onclick="deleteOrder('${key}')" class="w-full bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete Order</button></div>`;
             document.getElementById('orderModal').classList.add('active');
         }
 
         function deleteOrder(key) { if(confirm("Delete order?")) { database.ref('orders/' + key).remove(); closeModal(); } }
 
-        // --- UPLOAD LOGIC ---
         async function uploadAll() {
             const btn = document.getElementById('uploadBtn');
             const fileInputs = document.querySelectorAll('.pImg');
