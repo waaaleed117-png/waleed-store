@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waleed Store - Admin Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: white; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .card { background: #1e293b; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom: 30px; border: 1px solid #334155; }
+        h2 { color: #3b82f6; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #334155; border-radius: 8px; background: #0f172a; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #2563eb; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1e293b; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; font-size: 14px; }
+        th { background: #334155; color: #3b82f6; }
+        .delete-btn { background: #ef4444; padding: 5px 10px; border-radius: 5px; font-size: 12px; width: auto; }
+        .delete-btn:hover { background: #dc2626; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>Add New Product</h2>
+        <input type="text" id="pName" placeholder="Product Name (e.g. Luxury Watch)">
+        <input type="number" id="pPrice" placeholder="Price (Rs.)">
+        <input type="text" id="pImage" placeholder="Image URL (Pinterest or Direct Link)">
+        <button onclick="addProduct()">Upload to Website</button>
+    </div>
+
+    <div class="card">
+        <h2>Recent Orders</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-list">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Apka Firebase Config jo aapne diya tha
+    const firebaseConfig = {
+        apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
+        authDomain: "waleed-store-f7369.firebaseapp.com",
+        projectId: "waleed-store-f7369",
+        storageBucket: "waleed-store-f7369.firebasestorage.app",
+        messagingSenderId: "766742927418",
+        appId: "1:766742927418:web:310f0cb6afd311a4a93d03"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // 1. Product Add Karne Ka Function
+    function addProduct() {
+        const name = document.getElementById('pName').value;
+        const price = document.getElementById('pPrice').value;
+        const image = document.getElementById('pImage').value;
+
+        if(name && price && image) {
+            database.ref('products').push({
+                name: name,
+                price: price,
+                image: image
+            }).then(() => {
+                alert("Zabardast! Product website par add ho gaya.");
+                document.getElementById('pName').value = '';
+                document.getElementById('pPrice').value = '';
+                document.getElementById('pImage').value = '';
+            });
+        } else {
+            alert("Meharbani karke saari maloomat bharein.");
+        }
+    }
+
+    // 2. Orders ko Live Load Karne Ka Function
+    database.ref('orders').on('value', (snapshot) => {
+        const ordersList = document.getElementById('orders-list');
+        ordersList.innerHTML = '';
+        snapshot.forEach((childSnapshot) => {
+            const order = childSnapshot.val();
+            ordersList.innerHTML += `
+                <tr>
+                    <td>${order.customerName}</td>
+                    <td>${order.productName}</td>
+                    <td>Rs. ${order.price}</td>
+                    <td>${order.date || 'N/A'}</td>
+                    <td><button class="delete-btn" onclick="deleteOrder('${childSnapshot.key}')">Remove</button></td>
+                </tr>
+            `;
+        });
+    });
+
+    // 3. Order Khatam Karne Ka Function
+    function deleteOrder(id) {
+        if(confirm("Kya aap is order ko list se hatana chahte hain?")) {
+            database.ref('orders/' + id).remove();
+        }
+    }
+</script>
+
+</body>
+</html>
