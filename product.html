@@ -15,7 +15,6 @@
         body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
         
-        /* Fixed Swipe Slider Logic */
         .slider-wrapper {
             width: 100%;
             position: relative;
@@ -37,7 +36,7 @@
         .slider-container::-webkit-scrollbar { display: none; }
 
         .slide { 
-            flex: 0 0 100%; /* Yeh har image ko 100% width par fix rakhega */
+            flex: 0 0 100%; 
             width: 100%;
             scroll-snap-align: start; 
             display: flex; 
@@ -90,6 +89,7 @@
             </div>
 
             <input type="hidden" id="pDeliveryVal" value="200">
+            <input type="hidden" id="pCodVal" value="0">
 
             <div class="py-4 border-t border-slate-100">
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Description</h3>
@@ -133,6 +133,7 @@
                     document.getElementById('pPrice').innerText = 'Rs. ' + p.price;
                     document.getElementById('pDesc').innerText = p.desc;
                     document.getElementById('pDeliveryVal').value = p.delivery || "200";
+                    document.getElementById('pCodVal').value = p.cod_fee || "0";
                     
                     const images = p.images || [p.image];
                     const slider = document.getElementById('imageSlider');
@@ -194,12 +195,14 @@
             const imgElement = document.querySelector('.slide img');
             const pImg = imgElement ? imgElement.src : "";
             const pDelivery = document.getElementById('pDeliveryVal').value;
+            const pCod = document.getElementById('pCodVal').value;
 
-            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
+            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery, codFee: pCod };
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             cart.push(item);
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartBadge();
+            alert("Added to cart!");
         }
 
         function handleBuyNow() {
@@ -208,10 +211,10 @@
             const imgElement = document.querySelector('.slide img');
             const pImg = imgElement ? imgElement.src : "";
             const pDelivery = document.getElementById('pDeliveryVal').value;
+            const pCod = document.getElementById('pCodVal').value;
 
-            const directItem = [{ name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery }];
+            const directItem = [{ name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery, codFee: pCod }];
             
-            // Buy Now ke liye cart ko replace karein taake checkout par sirf aik hi product jaye
             localStorage.setItem('cart', JSON.stringify(directItem));
             window.location.href = 'checkout.html'; 
         }
