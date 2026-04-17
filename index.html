@@ -16,12 +16,28 @@
         .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
         .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
         
+        /* Floating Animation for WhatsApp */
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
         .fixed-wa { 
             position: fixed; bottom: 20px; right: 15px; z-index: 9999; 
             background-color: #25D366; color: white; width: 55px; height: 55px; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+            animation: floating 3s ease-in-out infinite;
         }
+
+        /* Pulse Animation for Order Now Button */
+        @keyframes pulse-ring {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+            70% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+        .animate-order { animation: pulse-ring 2s infinite; }
 
         /* Colorful Gradient for Premium Quality */
         .premium-text {
@@ -67,7 +83,7 @@
             </p>
             
             <div data-aos="zoom-in" data-aos-delay="400">
-                <a href="#products" class="bg-blue-600 text-white px-8 py-3.5 rounded-xl font-bold text-md shadow-xl inline-block btn-hover uppercase tracking-wider">
+                <a href="#products" class="animate-order bg-blue-600 text-white px-8 py-3.5 rounded-xl font-bold text-md shadow-xl inline-block btn-hover uppercase tracking-wider">
                     Order Now
                 </a>
             </div>
@@ -120,11 +136,11 @@
                 <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
                     <div class="mb-4">
                         <label class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1 block">Full Name</label>
-                        <input type="text" id="userName" placeholder="Your Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition text-md">
+                        <input type="text" id="userName" placeholder="Your Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition text-md text-white">
                     </div>
                     <div class="mb-6">
                         <label class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1 block">Message</label>
-                        <textarea id="userMsg" placeholder="Type here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition h-20 text-md"></textarea>
+                        <textarea id="userMsg" placeholder="Type here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition h-20 text-md text-white"></textarea>
                     </div>
                     <button onclick="sendWhatsApp()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-sm uppercase tracking-widest btn-hover shadow-lg shadow-blue-500/20">
                         Send to WhatsApp
