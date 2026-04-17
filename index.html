@@ -62,4 +62,110 @@
             <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
         </div>
         <div id="product-grid" class="grid grid-cols-2 gap-4">
-            <p class="text-center col-span-2 text-slate
+            <p class="text-center col-span-2 text-slate-400">Loading products...</p>
+        </div>
+    </section>
+
+    <section id="contact" class="py-16 px-6 bg-slate-900 text-white rounded-t-[3rem]">
+        <div class="container mx-auto">
+            <h2 class="text-2xl font-bold text-center mb-8">Contact us</h2>
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-10">
+                <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none text-white text-sm mb-4">
+                <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
+                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send to WhatsApp</button>
+            </div>
+            <div class="grid grid-cols-1 gap-8 text-center">
+                <div>
+                    <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-2"></i>
+                    <h4 class="text-xs font-bold text-blue-400 uppercase">Location</h4>
+                    <p class="text-sm opacity-80">Punjab, Pakistan</p>
+                </div>
+                <div>
+                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-2"></i>
+                    <h4 class="text-xs font-bold text-green-400 uppercase">WhatsApp</h4>
+                    <p class="text-sm opacity-80">+92 370 4884772</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-slate-500 text-[9px] bg-slate-900 tracking-widest uppercase border-t border-white/5">
+        © 2026 WALEED STORE. PROFESSIONAL PREMIUM QUALITY.
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
+            authDomain: "waleed-store-f7369.firebaseapp.com",
+            projectId: "waleed-store-f7369",
+            storageBucket: "waleed-store-f7369.firebasestorage.app",
+            messagingSenderId: "766742927418",
+            appId: "1:766742927418:web:310f0cb6afd311a4a93d03"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const countElement = document.getElementById('cart-count');
+            if (countElement) {
+                countElement.innerText = cart.length;
+            }
+        }
+
+        window.addEventListener('pageshow', function(event) {
+            updateCartCount();
+        });
+
+        updateCartCount();
+
+        database.ref('products').on('value', (snapshot) => {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            snapshot.forEach((child) => {
+                const p = child.val();
+                const id = child.key;
+                
+                // --- UPDATE: Sirf images dikhayega, video ko skip karega ---
+                const imagesArray = p.images || [p.image];
+                const firstImage = imagesArray[0] || 'https://placehold.co/400x400?text=Product';
+
+                grid.innerHTML += `
+                    <div class="product-card bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm cursor-pointer" 
+                         onclick="window.location.href='product.html?id=${id}'" 
+                         data-aos="fade-up">
+                        <div class="mb-3 rounded-xl overflow-hidden aspect-square">
+                            <img src="${firstImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x400?text=Product'">
+                        </div>
+                        <h3 class="font-bold text-[10px] text-slate-800 truncate">${p.name}</h3>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] font-bold text-blue-600">Rs. ${p.price}</span>
+                            <div class="bg-blue-600 text-white w-7 h-7 rounded-lg text-xs flex items-center justify-center">
+                                <i class="fa-solid fa-eye text-[8px]"></i>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        function sendOrder() {
+            const name = document.getElementById('userName').value;
+            const msg = document.getElementById('userMsg').value;
+            if(!name || !msg) { alert("Please enter name and message"); return; }
+
+            database.ref('orders').push({
+                customerName: name,
+                productName: "General Inquiry",
+                price: "N/A",
+                message: msg,
+                date: new Date().toLocaleString()
+            }).then(() => {
+                window.open(`https://wa.me/923704884772?text=Order Details:%0AName: ${name}%0AMessage: ${msg}`, '_blank');
+            });
+        }
+
+        AOS.init({ duration: 1000, once: true });
+    </script>
+</body>
+</html>
