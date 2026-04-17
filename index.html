@@ -23,9 +23,9 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); transition: 0.3s;
         }
-        .fixed-wa:hover { transform: scale(1.1) rotate(5deg); }
+        .fixed-wa:hover { transform: scale(1.1); }
 
-        /* Pulse Animation for Order Button */
+        /* Pulse for Order Button */
         @keyframes pulse-custom {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
             70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
@@ -41,11 +41,11 @@
         <i class="fa-brands fa-whatsapp text-3xl"></i>
     </a>
 
-    <nav class="glass fixed w-full top-0 z-50 px-6 py-2 border-b border-slate-100">
+    <nav class="glass fixed w-full top-0 z-50 px-6 py-3 border-b border-slate-100">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="#" class="flex flex-col leading-none">
-                <span class="text-xl font-black tracking-tighter text-slate-900 uppercase">Waleed</span>
-                <span class="text-sm font-bold text-blue-600 tracking-[0.2em] uppercase">Store</span>
+            <a href="#" class="flex flex-col items-center leading-none">
+                <span class="text-2xl font-black tracking-tighter text-slate-900 uppercase">Waleed</span>
+                <span class="text-2xl font-black tracking-tighter text-blue-600 uppercase">Store</span>
             </a>
             
             <div class="relative cursor-pointer btn-hover p-2">
@@ -55,11 +55,11 @@
         </div>
     </nav>
 
-    <header class="hero-bg pt-44 pb-32 text-white relative">
+    <header class="hero-bg pt-48 pb-32 text-white relative">
         <div class="container mx-auto px-6 text-center">
             <div data-aos="zoom-in" data-aos-duration="1000">
                 <h1 class="text-6xl font-black leading-tight mb-4 uppercase italic tracking-tighter">
-                    PREMIUM<br><span class="text-blue-400 not-italic">QUALITY</span>
+                    PREMIUM<br><span class="text-blue-400">QUALITY</span>
                 </h1>
             </div>
             
@@ -87,7 +87,7 @@
                     <i class="fa-solid fa-bag-shopping text-slate-100 text-9xl"></i>
                 </div>
                 <h3 class="font-black text-2xl mb-2 uppercase italic">Premium Item</h3>
-                <p class="text-slate-500 mb-6">High-quality design crafted for your daily needs.</p>
+                <p class="text-slate-500 mb-6 italic">Top quality guaranteed.</p>
                 <div class="flex justify-between items-center">
                     <span class="text-3xl font-black text-slate-900">Rs. 4,500</span>
                     <button class="bg-blue-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center btn-hover shadow-lg">
@@ -112,9 +112,9 @@
                     </div>
                     <div class="mb-8">
                         <label class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 block font-bold">Message</label>
-                        <textarea id="userMsg" placeholder="Type your message here..." class="w-full bg-transparent border-b-2 border-white/20 p-3 outline-none focus:border-blue-500 transition h-24 text-white"></textarea>
+                        <textarea id="userMsg" placeholder="Type message..." class="w-full bg-transparent border-b-2 border-white/20 p-3 outline-none focus:border-blue-500 transition h-24 text-white"></textarea>
                     </div>
-                    <button onclick="sendWhatsApp()" class="w-full bg-blue-600 py-5 rounded-2xl font-black text-lg uppercase tracking-widest btn-hover shadow-xl shadow-blue-500/30">
+                    <button onclick="sendWhatsApp()" class="w-full bg-blue-600 py-5 rounded-2xl font-black text-lg uppercase tracking-widest btn-hover shadow-xl">
                         Send to WhatsApp
                     </button>
                 </div>
@@ -123,18 +123,18 @@
             <div class="grid grid-cols-1 gap-10 text-center" data-aos="fade-up">
                 <div>
                     <i class="fa-solid fa-map-location-dot text-blue-500 text-3xl mb-3"></i>
-                    <p class="text-lg font-bold opacity-90">Punjab, Pakistan</p>
+                    <p class="text-lg font-bold">Punjab, Pakistan</p>
                 </div>
                 <div>
                     <i class="fa-brands fa-whatsapp text-green-500 text-3xl mb-3"></i>
-                    <p class="text-lg font-bold opacity-90">+92 370 4884772</p>
+                    <p class="text-lg font-bold">+92 370 4884772</p>
                 </div>
             </div>
         </div>
     </section>
 
     <footer class="py-12 text-center text-slate-600 text-[10px] bg-slate-900 tracking-[0.3em] uppercase">
-        &copy; 2026 WALEED STORE. Quality Guaranteed.
+        &copy; 2026 WALEED STORE.
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -150,5 +150,4 @@
         }
     </script>
 </body>
-                        </html>
-                        
+</html>
