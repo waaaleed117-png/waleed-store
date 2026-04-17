@@ -60,9 +60,15 @@
                 </div>
             </div>
 
-            <div class="mb-6">
-                <label class="text-xs text-slate-400 ml-2">Delivery Charges (Rs.)</label>
-                <input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. 200" value="200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="text-xs text-slate-400 ml-2">Delivery Charges (Rs.)</label>
+                    <input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. 200" value="200">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 ml-2 text-blue-400 font-bold">Cash on Delivery (COD) Fee (Rs.)</label>
+                    <input type="number" id="pCod" class="w-full bg-slate-900/50 border border-blue-900/30 border p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. 50" value="0">
+                </div>
             </div>
 
             <div class="mb-6">
@@ -152,7 +158,8 @@
         async function uploadAll() {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
-            const delivery = document.getElementById('pDelivery').value; // NAYA
+            const delivery = document.getElementById('pDelivery').value;
+            const cod_fee = document.getElementById('pCod').value; // NAYA COD FIELD
             const desc = document.getElementById('pDesc').value;
             const video = document.getElementById('pVideo').value;
             const fileInputs = document.querySelectorAll('.pImg');
@@ -176,7 +183,7 @@
                 }
 
                 await database.ref('products').push({
-                    name, price, delivery, desc, video, // Delivery yahan add kar di
+                    name, price, delivery, cod_fee, desc, video, // COD Fee yahan save ho rahi hai
                     images: uploadedUrls,
                     date: new Date().toLocaleString()
                 });
@@ -205,6 +212,7 @@
                 
                 const displayImg = p.images ? p.images[0] : (p.image ? p.image : 'https://placehold.co/100x100?text=No+Img');
                 const displayName = p.name || 'Unnamed Product';
+                const codLabel = p.cod_fee ? ` | COD Fee: ${p.cod_fee}` : '';
 
                 adminList.innerHTML += `
                     <div class="glass-card p-4 border-l-4 border-yellow-500 flex justify-between items-center">
@@ -212,7 +220,7 @@
                             <img src="${displayImg}" class="w-12 h-12 object-cover rounded-lg bg-slate-800 shrink-0">
                             <div class="truncate">
                                 <h3 class="font-bold text-sm text-white truncate">${displayName}</h3>
-                                <p class="text-xs text-slate-400">Rs. ${p.price || '0'}</p>
+                                <p class="text-xs text-slate-400">Rs. ${p.price || '0'}${codLabel}</p>
                             </div>
                         </div>
                         <button onclick="deleteProduct('${key}')" class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition shrink-0 ml-2">
