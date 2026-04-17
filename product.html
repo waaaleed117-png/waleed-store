@@ -15,19 +15,31 @@
         body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
         
+        /* Fixed Swipe Slider Logic */
+        .slider-wrapper {
+            width: 100%;
+            position: relative;
+            border-radius: 2rem;
+            overflow: hidden;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+        }
+
         .slider-container { 
             display: flex; 
             overflow-x: auto; 
             scroll-snap-type: x mandatory; 
             scroll-behavior: smooth; 
             -webkit-overflow-scrolling: touch;
+            width: 100%;
             aspect-ratio: 1/1;
-            background: #f8fafc;
         }
         .slider-container::-webkit-scrollbar { display: none; }
+
         .slide { 
-            min-width: 100%; 
-            scroll-snap-align: center; 
+            flex: 0 0 100%; /* Yeh har image ko 100% width par fix rakhega */
+            width: 100%;
+            scroll-snap-align: start; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -37,6 +49,7 @@
 
         .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background: #f1f5f9; flex-shrink: 0; }
         .thumb-img.active { border-color: #2563eb; transform: scale(1.05); }
+        
         .buy-btn { animation: pulse-ring 2s infinite; }
         @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -62,8 +75,12 @@
 
     <div class="container mx-auto px-4 py-6">
         <div class="mb-6">
-            <div id="imageSlider" class="slider-container rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"></div>
-            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-1"></div>
+            <div class="slider-wrapper">
+                <div id="imageSlider" class="slider-container">
+                    </div>
+            </div>
+            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-1">
+            </div>
         </div>
 
         <div class="space-y-4">
@@ -131,7 +148,7 @@
                         thumb.src = img;
                         thumb.className = `thumb-img ${index === 0 ? 'active' : ''}`;
                         thumb.onclick = () => {
-                            slide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                            slider.scrollTo({ left: slider.clientWidth * index, behavior: 'smooth' });
                         };
                         thumbContainer.appendChild(thumb);
                     });
@@ -147,7 +164,7 @@
                         videoThumb.className = 'thumb-img flex items-center justify-center bg-slate-800 text-white';
                         videoThumb.innerHTML = `<i class="fa-solid fa-play"></i>`;
                         videoThumb.onclick = () => {
-                            videoSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                            slider.scrollTo({ left: slider.scrollWidth, behavior: 'smooth' });
                         };
                         thumbContainer.appendChild(videoThumb);
                     }
@@ -171,7 +188,6 @@
             }
         }
 
-        // --- SILENT ADD TO CART (No Alert) ---
         function handleAddToCart() {
             const pName = document.getElementById('pName').innerText;
             const pPrice = document.getElementById('pPrice').innerText;
@@ -180,16 +196,12 @@
             const pDelivery = document.getElementById('pDeliveryVal').value;
 
             const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
-            
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             cart.push(item);
             localStorage.setItem('cart', JSON.stringify(cart));
-            
             updateCartBadge();
-            // Yahan se alert bilkul delete kar diya hai
         }
 
-        // --- DIRECT BUY NOW (No Alert) ---
         function handleBuyNow() {
             const pName = document.getElementById('pName').innerText;
             const pPrice = document.getElementById('pPrice').innerText;
@@ -197,11 +209,10 @@
             const pImg = imgElement ? imgElement.src : "";
             const pDelivery = document.getElementById('pDeliveryVal').value;
 
-            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
+            const directItem = [{ name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery }];
             
-            // Cart clear karke sirf yeh item daalna
-            localStorage.setItem('cart', JSON.stringify([item]));
-            
+            // Buy Now ke liye cart ko replace karein taake checkout par sirf aik hi product jaye
+            localStorage.setItem('cart', JSON.stringify(directItem));
             window.location.href = 'checkout.html'; 
         }
 
