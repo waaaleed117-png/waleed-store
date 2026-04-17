@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Waleed Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style>
+        body { background: #0a0f1c; color: white; font-family: 'Inter', sans-serif; }
+        .main-img { height: 400px; width: 100%; object-fit: contain; background: #111827; border-radius: 20px; }
+        .thumb-img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 2px solid transparent; }
+        .thumb-img:hover, .thumb-img.active { border-color: #3b82f6; }
+    </style>
+</head>
+<body>
+
+    <div class="container mx-auto px-4 py-8">
+        <button onclick="history.back()" class="mb-6 text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-arrow-left"></i> Back to Shop
+        </button>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div>
+                <img id="mainImage" src="" class="main-img mb-4 shadow-2xl">
+                <div id="thumbContainer" class="flex gap-3 overflow-x-auto pb-2">
+                    </div>
+            </div>
+
+            <div class="space-y-6">
+                <h1 id="pName" class="text-3xl md:text-4xl font-bold">Loading...</h1>
+                <p id="pPrice" class="text-2xl text-blue-500 font-semibold"></p>
+                
+                <div class="border-t border-slate-800 pt-4">
+                    <h3 class="text-lg font-bold mb-2">Description:</h3>
+                    <p id="pDesc" class="text-slate-400 leading-relaxed whitespace-pre-wrap"></p>
+                </div>
+
+                <div class="flex gap-4 pt-6">
+                    <button class="flex-1 bg-slate-800 hover:bg-slate-700 py-4 rounded-xl font-bold transition">Add to Cart</button>
+                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold shadow-lg shadow-blue-600/20 transition">Buy Now</button>
+                </div>
+
+                <div id="videoContainer" class="hidden pt-6">
+                    <h3 class="text-lg font-bold mb-3 italic text-yellow-500">Product Video:</h3>
+                    <div id="videoFrame"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
+            authDomain: "waleed-store-f7369.firebaseapp.com",
+            databaseURL: "https://waleed-store-f7369-default-rtdb.firebaseio.com/",
+            projectId: "waleed-store-f7369",
+            storageBucket: "waleed-store-f7369.appspot.com",
+            messagingSenderId: "148677610444",
+            appId: "1:148677610444:web:2a838575003504f216503c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Get Product ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        if (productId) {
+            database.ref('products/' + productId).once('value', (snapshot) => {
+                const p = snapshot.val();
+                if (p) {
+                    document.getElementById('pName').innerText = p.name;
+                    document.getElementById('pPrice').innerText = 'Rs. ' + p.price;
+                    document.getElementById('pDesc').innerText = p.desc;
+                    
+                    // Handle Images
+                    const images = p.images || [p.image];
+                    const mainImg = document.getElementById('mainImage');
+                    mainImg.src = images[0];
+
+                    const thumbContainer = document.getElementById('thumbContainer');
+                    images.forEach((img, index) => {
+                        const thumb = document.createElement('img');
+                        thumb.src = img;
+                        thumb.className = `thumb-img ${index === 0 ? 'active' : ''}`;
+                        thumb.onclick = () => {
+                            mainImg.src = img;
+                            document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+                            thumb.classList.add('active');
+                        };
+                        thumbContainer.appendChild(thumb);
+                    });
+
+                    // Handle Video
+                    if (p.video) {
+                        document.getElementById('videoContainer').classList.remove('hidden');
+                        document.getElementById('videoFrame').innerHTML = `
+                            <iframe class="w-full aspect-video rounded-xl" src="${p.video.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>
+                        `;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
