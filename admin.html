@@ -3,37 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Multi-Image Upload</title>
+    <title>Waleed Store | Pro Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        body { background: #0f172a; color: white; font-family: 'Poppins', sans-serif; }
-        .card { background: #1e293b; border-radius: 20px; padding: 25px; margin-bottom: 20px; }
-        input { background: #334155; border: none; padding: 10px; border-radius: 8px; width: 100%; color: white; margin-bottom: 10px; }
-        button { background: #2563eb; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; }
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #0a0f1c; color: #e2e8f0; }
+        .sidebar { transition: 0.3s; width: 260px; background: #111827; height: 100vh; position: fixed; left: -260px; z-index: 100; }
+        .sidebar.active { left: 0; }
+        .main-content { transition: 0.3s; padding: 20px; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; }
+        .upload-box { border: 2px dashed #334155; transition: 0.3s; cursor: pointer; }
+        .upload-box:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden-section { display: none; }
     </style>
 </head>
-<body class="p-4">
-    <div class="max-w-md mx-auto">
-        <h1 class="text-xl font-bold text-center mb-6 text-blue-400">Add Product (Multi-Image)</h1>
-        
-        <div class="card">
-            <input type="text" id="pName" placeholder="Product Name">
-            <input type="number" id="pPrice" placeholder="Price (Rs.)">
-            
-            <p class="text-xs text-slate-400 mb-2">Upload up to 4 Images:</p>
-            <input type="file" class="pImg" accept="image/*">
-            <input type="file" class="pImg" accept="image/*">
-            <input type="file" class="pImg" accept="image/*">
-            <input type="file" class="pImg" accept="image/*">
+<body>
 
-            <p class="text-xs text-yellow-500 mb-2 mt-2">YouTube Video Link (Optional):</p>
-            <input type="text" id="pVideo" placeholder="https://youtube.com/...">
+    <div id="sidebar" class="sidebar border-r border-slate-800 p-6">
+        <div class="flex items-center justify-between mb-10">
+            <span class="text-xl font-bold text-blue-500">Waleed Pro</span>
+            <button onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <nav class="space-y-4">
+            <button onclick="showSection('add-product')" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
+                <i class="fa-solid fa-plus-circle"></i> Add Product
+            </button>
+            <button onclick="showSection('view-orders')" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
+                <i class="fa-solid fa-cart-shopping"></i> View Orders
+            </button>
+        </nav>
+    </div>
 
-            <button id="uploadBtn" onclick="uploadAll()">Upload to Store</button>
+    <div class="main-content">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="toggleSidebar()" class="text-2xl p-2 bg-slate-800 rounded-lg"><i class="fa-solid fa-bars-staggered"></i></button>
+            <h1 id="page-title" class="text-2xl font-bold">Add Product</h1>
+        </div>
+
+        <div id="add-product" class="glass-card p-6 max-w-2xl mx-auto shadow-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="text-xs text-slate-400 ml-2">Product Name</label>
+                    <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. Ultra Smart Watch">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 ml-2">Price (Rs.)</label>
+                    <input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="e.g. 4500">
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="text-xs text-slate-400 ml-2">Description (Phase 1 Ready)</label>
+                <textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-32 outline-none focus:border-blue-500" placeholder="Write full details here..."></textarea>
+            </div>
+
+            <div class="mb-6">
+                <label class="text-xs text-slate-400 ml-2">YouTube Video Link</label>
+                <input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="https://youtube.com/...">
+            </div>
+
+            <div class="mb-8">
+                <label class="text-xs text-slate-400 ml-2">Product Images (Upload in order)</label>
+                <div class="grid grid-cols-2 gap-3 mt-2">
+                    <input type="file" class="pImg hidden" id="img1" onchange="updateLabel(1)">
+                    <label for="img1" id="lbl1" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 1</label>
+                    
+                    <input type="file" class="pImg hidden" id="img2" onchange="updateLabel(2)">
+                    <label for="img2" id="lbl2" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 2</label>
+                    
+                    <input type="file" class="pImg hidden" id="img3" onchange="updateLabel(3)">
+                    <label for="img3" id="lbl3" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 3</label>
+                    
+                    <input type="file" class="pImg hidden" id="img4" onchange="updateLabel(4)">
+                    <label for="img4" id="lbl4" class="upload-box p-4 rounded-xl text-center text-xs text-slate-500"><i class="fa-solid fa-image mb-2 text-xl"></i><br>Image 4</label>
+                </div>
+            </div>
+
+            <button id="uploadBtn" onclick="uploadAll()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/20 transition active:scale-95">
+                Upload to Website
+            </button>
+        </div>
+
+        <div id="view-orders" class="hidden-section">
+            <div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
         </div>
     </div>
 
@@ -51,20 +109,39 @@
         const database = firebase.database();
         const imgbbKey = "2d7d1d644318674d9d8dcd961cb666ae";
 
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+        function showSection(id) {
+            document.getElementById('add-product').classList.add('hidden-section');
+            document.getElementById('view-orders').classList.add('hidden-section');
+            document.getElementById(id).classList.remove('hidden-section');
+            document.getElementById('page-title').innerText = id === 'add-product' ? 'Add Product' : 'Customer Orders';
+            toggleSidebar();
+        }
+
+        function updateLabel(id) {
+            const input = document.getElementById('img'+id);
+            const label = document.getElementById('lbl'+id);
+            if(input.files[0]) {
+                label.classList.add('bg-blue-600/20', 'text-blue-400', 'border-blue-500');
+                label.innerHTML = `<i class="fa-solid fa-check-circle mb-2 text-xl"></i><br>Selected`;
+            }
+        }
+
         async function uploadAll() {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
+            const desc = document.getElementById('pDesc').value;
             const video = document.getElementById('pVideo').value;
             const fileInputs = document.querySelectorAll('.pImg');
             const btn = document.getElementById('uploadBtn');
 
-            if (!name || !price) return alert("Fill Name and Price");
+            if (!name || !price || !desc) return alert("Please fill Name, Price and Description!");
 
             btn.disabled = true;
-            btn.innerHTML = '<div class="loader"></div> Uploading Images...';
+            btn.innerHTML = '<div class="loader"></div> Processing...';
 
             let uploadedUrls = [];
-
             try {
                 for (let input of fileInputs) {
                     if (input.files[0]) {
@@ -76,22 +153,41 @@
                     }
                 }
 
-                if (uploadedUrls.length === 0) throw new Error("Select at least 1 image");
-
                 await database.ref('products').push({
-                    name, price, video,
+                    name, price, desc, video,
                     images: uploadedUrls,
                     date: new Date().toLocaleString()
                 });
 
-                alert("Product Added with Multiple Images!");
+                alert("Zabardast! Product upload ho gaya.");
                 location.reload();
             } catch (e) {
-                alert(e.message);
+                alert("Upload failed!");
                 btn.disabled = false;
-                btn.innerText = "Upload to Store";
+                btn.innerText = "Upload to Website";
             }
         }
+
+        // Realtime Orders Loader
+        database.ref('orders').on('value', (snapshot) => {
+            const list = document.getElementById('orders-list');
+            list.innerHTML = "";
+            snapshot.forEach(child => {
+                const o = child.val();
+                list.innerHTML += `
+                    <div class="glass-card p-5 border-l-4 border-blue-500">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-bold text-lg text-blue-400">${o.customerName}</h3>
+                            <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400">${o.date}</span>
+                        </div>
+                        <p class="text-sm text-slate-300 mb-1 font-semibold">Product: ${o.productName}</p>
+                        <p class="text-sm text-slate-300 mb-3">Total: Rs. ${o.price}</p>
+                        <div class="bg-slate-900/50 p-3 rounded-lg text-xs text-slate-400 italic">
+                            "${o.message}"
+                        </div>
+                    </div>`;
+            });
+        });
     </script>
 </body>
 </html>
