@@ -32,7 +32,7 @@
                 <span class="text-xl font-extrabold text-blue-600">Store</span>
             </a>
             <div class="flex items-center gap-4">
-                <div class="relative p-1">
+                <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
                     <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
                     <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
                 </div>
@@ -95,7 +95,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
 
-        // Fetch Product Data
         if (productId) {
             database.ref('products/' + productId).once('value', (snapshot) => {
                 const p = snapshot.val();
@@ -130,7 +129,6 @@
             });
         }
 
-        // --- CART SYSTEM LOGIC ---
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         updateCartUI();
 
@@ -154,11 +152,10 @@
             }
         }
 
+        // Change 2: Buy Now function ab seedha checkout par bhejta hai
         function directOrder() {
-            const name = document.getElementById('pName').innerText;
-            const price = document.getElementById('pPrice').innerText;
-            // Immediate Redirect to Contact with Product Context
-            window.location.href = `index.html?order=${encodeURIComponent(name)}&price=${encodeURIComponent(price)}#contact`;
+            addToCart(); // Pehle cart mein save hoga
+            window.location.href = 'checkout.html'; // Phir checkout page open ho jayega
         }
     </script>
 </body>
