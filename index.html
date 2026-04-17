@@ -16,28 +16,14 @@
         .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
         .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
         
-        /* Always-on Floating WhatsApp */
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
         .fixed-wa { 
             position: fixed; bottom: 20px; right: 15px; z-index: 9999; 
             background-color: #25D366; color: white; width: 55px; height: 55px; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
-            animation: floating 3s ease-in-out infinite;
         }
 
-        /* Always-on Pulse for Order Button */
-        @keyframes pulse-ring {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
-            70% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-        }
-        .animate-order { animation: pulse-ring 2s infinite; }
-
+        /* Colorful Gradient for Premium Quality */
         .premium-text {
             background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6);
             -webkit-background-clip: text;
@@ -60,6 +46,7 @@
                 <span class="text-xl font-extrabold text-slate-900">Waleed</span>
                 <span class="text-xl font-extrabold text-blue-600">Store</span>
             </a>
+            
             <div class="relative cursor-pointer btn-hover p-1">
                 <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
                 <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
@@ -69,16 +56,18 @@
 
     <header class="hero-bg pt-32 pb-20 text-white relative">
         <div class="container mx-auto px-6 text-center">
-            <div data-aos="fade-down" data-aos-duration="1000">
+            <div data-aos="fade-down">
                 <h1 class="text-3xl md:text-5xl mb-3 tracking-tight">
                     <span class="premium-text">Premium Quality</span>
                 </h1>
             </div>
-            <p class="text-slate-300 text-sm mb-8 max-w-xs mx-auto" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+            
+            <p class="text-slate-300 text-sm mb-8 max-w-xs mx-auto leading-relaxed" data-aos="fade-up" data-aos-delay="200">
                 Your trust is our priority. Choose your favorite product and order now.
             </p>
-            <div data-aos="zoom-in" data-aos-delay="400" data-aos-duration="800">
-                <a href="#products" class="animate-order bg-blue-600 text-white px-8 py-3.5 rounded-xl font-bold text-md shadow-xl inline-block btn-hover uppercase tracking-wider">
+            
+            <div data-aos="zoom-in" data-aos-delay="400">
+                <a href="#products" class="bg-blue-600 text-white px-8 py-3.5 rounded-xl font-bold text-md shadow-xl inline-block btn-hover uppercase tracking-wider">
                     Order Now
                 </a>
             </div>
@@ -86,13 +75,13 @@
     </header>
 
     <section id="products" class="py-16 px-4">
-        <div class="text-center mb-10" data-aos="fade-up" data-aos-duration="1000">
+        <div class="text-center mb-10" data-aos="fade-up">
             <h2 class="text-2xl font-bold text-slate-800">New Products</h2>
             <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
         </div>
         
         <div class="grid grid-cols-2 gap-4 container mx-auto">
-            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm" data-aos="fade-right" data-aos-duration="1000">
+            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm" data-aos="fade-up">
                 <div class="bg-white aspect-square rounded-xl mb-3 flex items-center justify-center shadow-inner">
                     <i class="fa-solid fa-bag-shopping text-slate-200 text-4xl"></i>
                 </div>
@@ -105,7 +94,7 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm" data-aos="fade-left" data-aos-delay="100" data-aos-duration="1000">
+            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm" data-aos="fade-up" data-aos-delay="100">
                 <div class="bg-white aspect-square rounded-xl mb-3 flex items-center justify-center shadow-inner">
                     <i class="fa-solid fa-star text-slate-200 text-4xl"></i>
                 </div>
@@ -123,22 +112,34 @@
 
     <section id="contact" class="py-16 px-6 bg-slate-900 text-white rounded-t-[3rem]">
         <div class="container mx-auto">
-            <div class="text-center mb-10" data-aos="fade-down" data-aos-duration="1000">
+            <div class="text-center mb-10" data-aos="fade-down">
                 <h2 class="text-2xl font-bold">Contact us</h2>
             </div>
-            <div class="space-y-4 mb-12" data-aos="zoom-in" data-aos-duration="1000">
+
+            <div class="space-y-4 mb-12" data-aos="zoom-in">
                 <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
                     <div class="mb-4">
                         <label class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1 block">Full Name</label>
-                        <input type="text" id="userName" placeholder="Your Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition text-md text-white">
+                        <input type="text" id="userName" placeholder="Your Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition text-md">
                     </div>
                     <div class="mb-6">
                         <label class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1 block">Message</label>
-                        <textarea id="userMsg" placeholder="Type here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition h-20 text-md text-white"></textarea>
+                        <textarea id="userMsg" placeholder="Type here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none focus:border-blue-500 transition h-20 text-md"></textarea>
                     </div>
-                    <button onclick="sendWhatsApp()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-sm uppercase tracking-widest btn-hover shadow-lg">
+                    <button onclick="sendWhatsApp()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-sm uppercase tracking-widest btn-hover shadow-lg shadow-blue-500/20">
                         Send to WhatsApp
                     </button>
+                </div>
+            </div>
+
+            <div class="space-y-8 text-center" data-aos="fade-up">
+                <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-map-location-dot text-blue-500 text-2xl mb-2"></i>
+                    <p class="text-sm font-medium opacity-80">Punjab, Pakistan</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <i class="fa-brands fa-whatsapp text-green-500 text-2xl mb-2"></i>
+                    <p class="text-sm font-medium opacity-80">+92 370 4884772</p>
                 </div>
             </div>
         </div>
@@ -150,13 +151,7 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // AOS Initialize with smooth scroll settings
-        AOS.init({
-            duration: 1000,
-            once: false, // Makes animations repeat on scroll up/down
-            mirror: true,
-            offset: 50
-        });
+        AOS.init({ duration: 800, once: false, mirror: true });
 
         function sendWhatsApp() {
             const name = document.getElementById('userName').value;
