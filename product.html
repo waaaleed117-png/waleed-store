@@ -15,7 +15,6 @@
         body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
         
-        /* Swipe Slider Logic */
         .slider-container { 
             display: flex; 
             overflow-x: auto; 
@@ -63,10 +62,8 @@
 
     <div class="container mx-auto px-4 py-6">
         <div class="mb-6">
-            <div id="imageSlider" class="slider-container rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-            </div>
-            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-1">
-            </div>
+            <div id="imageSlider" class="slider-container rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"></div>
+            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-1"></div>
         </div>
 
         <div class="space-y-4">
@@ -83,8 +80,8 @@
             </div>
 
             <div class="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex gap-3 z-40">
-                <button onclick="addToCart()" class="flex-1 bg-slate-100 text-slate-900 py-4 rounded-2xl font-bold text-sm active:scale-95 transition">Add to Cart</button>
-                <button onclick="directOrder()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm buy-btn active:scale-95 transition shadow-lg shadow-blue-600/20">Buy Now</button>
+                <button onclick="handleAddToCart()" class="flex-1 bg-slate-100 text-slate-900 py-4 rounded-2xl font-bold text-sm active:scale-95 transition">Add to Cart</button>
+                <button onclick="handleBuyNow()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm buy-btn active:scale-95 transition shadow-lg shadow-blue-600/20">Buy Now</button>
             </div>
         </div>
     </div>
@@ -124,7 +121,6 @@
                     const slider = document.getElementById('imageSlider');
                     const thumbContainer = document.getElementById('thumbContainer');
 
-                    // 1. Add Images to Slider
                     images.forEach((img, index) => {
                         const slide = document.createElement('div');
                         slide.className = 'slide';
@@ -140,7 +136,6 @@
                         thumbContainer.appendChild(thumb);
                     });
 
-                    // 2. Add Video as LAST slide
                     if (p.video) {
                         const vidId = p.video.includes('v=') ? p.video.split('v=')[1].split('&')[0] : p.video.split('/').pop();
                         const videoSlide = document.createElement('div');
@@ -148,7 +143,6 @@
                         videoSlide.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}" allowfullscreen></iframe>`;
                         slider.appendChild(videoSlide);
 
-                        // Video Thumbnail (Play Icon)
                         const videoThumb = document.createElement('div');
                         videoThumb.className = 'thumb-img flex items-center justify-center bg-slate-800 text-white';
                         videoThumb.innerHTML = `<i class="fa-solid fa-play"></i>`;
@@ -158,7 +152,6 @@
                         thumbContainer.appendChild(videoThumb);
                     }
 
-                    // Sync thumbnails with scroll
                     slider.addEventListener('scroll', () => {
                         const index = Math.round(slider.scrollLeft / slider.clientWidth);
                         const allThumbs = document.querySelectorAll('.thumb-img');
@@ -170,40 +163,49 @@
             });
         }
 
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        updateCartUI();
-
-        function addToCart() {
-            const pName = document.getElementById('pName').innerText;
-            const pPrice = document.getElementById('pPrice').innerText;
-            const firstImg = document.querySelector('.slide img');
-            const pImg = firstImg ? firstImg.src : "";
-            const pDelivery = document.getElementById('pDeliveryVal').value;
-
-            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
-            cart.push(item);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartUI();
-        }
-
-        function updateCartUI() {
+        function updateCartBadge() {
+            let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
             const countElement = document.getElementById('cart-count');
             if(countElement) {
-                countElement.innerText = cart.length;
+                countElement.innerText = currentCart.length;
             }
         }
 
-        function directOrder() {
+        // --- SILENT ADD TO CART (No Alert) ---
+        function handleAddToCart() {
             const pName = document.getElementById('pName').innerText;
             const pPrice = document.getElementById('pPrice').innerText;
-            const firstImg = document.querySelector('.slide img');
-            const pImg = firstImg ? firstImg.src : "";
+            const imgElement = document.querySelector('.slide img');
+            const pImg = imgElement ? imgElement.src : "";
             const pDelivery = document.getElementById('pDeliveryVal').value;
 
             const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
+            
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.push(item);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            updateCartBadge();
+            // Yahan se alert bilkul delete kar diya hai
+        }
+
+        // --- DIRECT BUY NOW (No Alert) ---
+        function handleBuyNow() {
+            const pName = document.getElementById('pName').innerText;
+            const pPrice = document.getElementById('pPrice').innerText;
+            const imgElement = document.querySelector('.slide img');
+            const pImg = imgElement ? imgElement.src : "";
+            const pDelivery = document.getElementById('pDeliveryVal').value;
+
+            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery };
+            
+            // Cart clear karke sirf yeh item daalna
             localStorage.setItem('cart', JSON.stringify([item]));
+            
             window.location.href = 'checkout.html'; 
         }
+
+        updateCartBadge();
     </script>
 </body>
 </html>
