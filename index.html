@@ -22,6 +22,12 @@
         .animate-order { animation: pulse-ring 2s infinite !important; }
         @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
         .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        
+        /* New Styles for Multi-Image and Video */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .video-container { position: relative; padding-bottom: 100%; height: 0; overflow: hidden; border-radius: 0.75rem; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     </style>
 </head>
 <body class="bg-white">
@@ -90,7 +96,6 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
             authDomain: "waleed-store-f7369.firebaseapp.com",
@@ -102,18 +107,43 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // YouTube ID Extractor
+        function getYoutubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         // Load Products
         database.ref('products').on('value', (snapshot) => {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
             snapshot.forEach((child) => {
                 const p = child.val();
+                
+                // Handle Multi-Image Logic
+                const imagesArray = p.images || [p.image];
+                let mediaHtml = '';
+                const vidId = p.video ? getYoutubeId(p.video) : null;
+
+                if(vidId) {
+                    // Show Video if link exists
+                    mediaHtml = `<div class="video-container mb-3"><iframe src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe></div>`;
+                } else {
+                    // Show Multi-Image Slider
+                    mediaHtml = `<div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar space-x-2 mb-3 rounded-xl">`;
+                    imagesArray.forEach(url => {
+                        mediaHtml += `<img src="${url}" class="snap-center min-w-full aspect-square object-cover rounded-xl" onerror="this.src='https://placehold.co/400x400?text=Product'">`;
+                    });
+                    mediaHtml += `</div>`;
+                }
+
                 grid.innerHTML += `
                     <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm" data-aos="fade-up">
-                        <img src="${p.image}" class="w-full aspect-square object-cover rounded-xl mb-3" onerror="this.src='https://placehold.co/400x400?text=Product'">
-                        <h3 class="font-bold text-xs text-slate-800">${p.name}</h3>
+                        ${mediaHtml}
+                        <h3 class="font-bold text-[10px] text-slate-800 truncate">${p.name}</h3>
                         <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs font-bold text-blue-600">Rs. ${p.price}</span>
+                            <span class="text-[10px] font-bold text-blue-600">Rs. ${p.price}</span>
                             <button onclick="selectProduct('${p.name}', '${p.price}')" class="bg-blue-600 text-white w-7 h-7 rounded-lg text-xs">+</button>
                         </div>
                     </div>`;
@@ -135,7 +165,6 @@
             const msg = document.getElementById('userMsg').value;
             if(!name || !msg) { alert("Please enter name and message"); return; }
 
-            // Save order to Firebase
             database.ref('orders').push({
                 customerName: name,
                 productName: selectedProduct,
@@ -151,3 +180,4 @@
     </script>
 </body>
 </html>
+
