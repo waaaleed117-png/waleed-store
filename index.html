@@ -13,33 +13,41 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-        html, body { max-width: 100%; overflow-x: hidden; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
-        .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
-        .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        html, body { max-width: 100%; overflow-x: hidden; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; background-color: #f8fafc; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        
+        /* Slider Styling */
+        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); aspect-ratio: 16/8; }
+        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.45, 0, 0.55, 1); }
+        .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: cover; }
+
+        /* Trust Badges */
+        .badge-box { background: white; padding: 12px 8px; border-radius: 15px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .badge-box i { font-size: 1.2rem; margin-bottom: 5px; color: #2563eb; }
+        .badge-box span { font-size: 9px; font-weight: 700; color: #475569; text-transform: uppercase; }
+
+        /* Premium Product Cards */
+        .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); border-color: #3b82f6; }
+        
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        .animate-order { animation: pulse-ring 2s infinite !important; }
-        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
-        .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
         
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .product-card { transition: transform 0.2s; }
-        .product-card:active { transform: scale(0.95); }
+        .premium-text { background: linear-gradient(to right, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
     </style>
 </head>
-<body class="bg-white">
+<body>
 
     <a href="https://wa.me/923704884772" target="_blank" class="fixed-wa">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <nav class="glass fixed w-full top-0 z-50 px-4 py-2 border-b border-slate-100">
+    <nav class="glass fixed w-full top-0 z-50 px-4 py-3 border-b border-slate-100">
         <div class="container mx-auto flex justify-between items-center">
             <a href="#" class="flex items-center space-x-1">
-                <span class="text-xl font-extrabold text-slate-900">Waleed</span>
-                <span class="text-xl font-extrabold text-blue-600">Store</span>
+                <span class="text-xl font-extrabold text-slate-900 uppercase tracking-tighter">Waleed</span>
+                <span class="text-xl font-extrabold text-blue-600 uppercase tracking-tighter">Store</span>
             </a>
             <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
                 <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
@@ -48,49 +56,71 @@
         </div>
     </nav>
 
-    <header class="hero-bg pt-32 pb-20 text-white text-center px-6">
-        <div data-aos="fade-down">
-            <h1 class="text-4xl font-extrabold mb-3"><span class="premium-text">Premium Quality</span></h1>
+    <main class="pt-20">
+        
+        <div class="px-4 py-4" data-aos="zoom-in">
+            <div class="slider-container">
+                <div id="sliderWrapper" class="slider-wrapper">
+                    <img src="https://placehold.co/800x400?text=Loading+Banners..." class="slider-img">
+                </div>
+            </div>
         </div>
-        <p class="text-slate-300 text-sm mb-8 max-w-xs mx-auto">Your trust is our priority. Choose your favorite product and order now.</p>
-        <a href="#products" class="animate-order bg-blue-600 text-white px-10 py-4 rounded-xl font-bold text-md inline-block uppercase shadow-lg">Order Now</a>
-    </header>
 
-    <section id="products" class="py-12 px-4">
-        <div class="text-center mb-10">
-            <h2 class="text-2xl font-bold text-slate-800">New Products</h2>
-            <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
+        <div class="grid grid-cols-3 gap-3 px-4 mb-8" data-aos="fade-up">
+            <div class="badge-box">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>Fast Shipping</span>
+            </div>
+            <div class="badge-box">
+                <i class="fa-solid fa-shield-check"></i>
+                <span>Check Warranty</span>
+            </div>
+            <div class="badge-box">
+                <i class="fa-solid fa-headset"></i>
+                <span>24/7 Support</span>
+            </div>
         </div>
-        <div id="product-grid" class="grid grid-cols-2 gap-4">
-            <p class="text-center col-span-2 text-slate-400">Loading products...</p>
-        </div>
-    </section>
+
+        <section id="products" class="px-4 pb-12">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800">New Arrivals</h2>
+                    <div class="h-1 w-8 bg-blue-600 rounded-full"></div>
+                </div>
+                <span class="text-xs font-bold text-blue-600">View All</span>
+            </div>
+            
+            <div id="product-grid" class="grid grid-cols-2 gap-4">
+                </div>
+        </section>
+
+    </main>
 
     <section id="contact" class="py-16 px-6 bg-slate-900 text-white rounded-t-[3rem]">
         <div class="container mx-auto">
-            <h2 class="text-2xl font-bold text-center mb-8">Contact us</h2>
+            <h2 class="text-2xl font-bold text-center mb-8">Quick Support</h2>
             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-10">
                 <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none text-white text-sm mb-4">
-                <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
-                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send to WhatsApp</button>
+                <textarea id="userMsg" placeholder="Order details or inquiry..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
+                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Message on WhatsApp</button>
             </div>
-            <div class="grid grid-cols-1 gap-8 text-center">
-                <div>
-                    <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-2"></i>
-                    <h4 class="text-xs font-bold text-blue-400 uppercase">Location</h4>
-                    <p class="text-sm opacity-80">Punjab, Pakistan</p>
+            <div class="grid grid-cols-2 gap-4 text-center">
+                <div class="bg-white/5 p-4 rounded-xl">
+                    <i class="fa-solid fa-location-dot text-blue-500 mb-2"></i>
+                    <h4 class="text-[10px] font-bold text-blue-400 uppercase">Location</h4>
+                    <p class="text-xs opacity-80">Punjab, PK</p>
                 </div>
-                <div>
-                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-2"></i>
-                    <h4 class="text-xs font-bold text-green-400 uppercase">WhatsApp</h4>
-                    <p class="text-sm opacity-80">+92 370 4884772</p>
+                <div class="bg-white/5 p-4 rounded-xl">
+                    <i class="fa-brands fa-whatsapp text-green-500 mb-2"></i>
+                    <h4 class="text-[10px] font-bold text-green-400 uppercase">WhatsApp</h4>
+                    <p class="text-xs opacity-80">+92 370 4884772</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="py-8 text-center text-slate-500 text-[9px] bg-slate-900 tracking-widest uppercase border-t border-white/5">
-        © 2026 WALEED STORE. PROFESSIONAL PREMIUM QUALITY.
+    <footer class="py-8 text-center text-slate-500 text-[10px] bg-slate-900 tracking-widest uppercase border-t border-white/5">
+        © 2026 WALEED STORE | OFFICIAL PREMIUM QUALITY
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -98,6 +128,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBYrmozXYLHxCmLsc8FX6aN6xSvORxXypo",
             authDomain: "waleed-store-f7369.firebaseapp.com",
+            databaseURL: "https://waleed-store-f7369-default-rtdb.firebaseio.com/",
             projectId: "waleed-store-f7369",
             storageBucket: "waleed-store-f7369.firebasestorage.app",
             messagingSenderId: "766742927418",
@@ -106,66 +137,73 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const countElement = document.getElementById('cart-count');
-            if (countElement) {
-                countElement.innerText = cart.length;
+        // --- SLIDER LOGIC ---
+        let currentSlide = 0;
+        database.ref('slider').on('value', (snapshot) => {
+            const wrapper = document.getElementById('sliderWrapper');
+            wrapper.innerHTML = "";
+            let images = [];
+            snapshot.forEach(child => {
+                images.push(child.val().url);
+                wrapper.innerHTML += `<img src="${child.val().url}" class="slider-img">`;
+            });
+            
+            if(images.length > 1) {
+                setInterval(() => {
+                    currentSlide = (currentSlide + 1) % images.length;
+                    wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+                }, 4000); // 4 Seconds Auto-Move
             }
-        }
-
-        window.addEventListener('pageshow', function(event) {
-            updateCartCount();
         });
 
-        updateCartCount();
-
+        // --- PRODUCT GRID LOGIC (PREMIUM) ---
         database.ref('products').on('value', (snapshot) => {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
             snapshot.forEach((child) => {
                 const p = child.val();
                 const id = child.key;
-                
-                // --- UPDATE: Sirf images dikhayega, video ko skip karega ---
                 const imagesArray = p.images || [p.image];
-                const firstImage = imagesArray[0] || 'https://placehold.co/400x400?text=Product';
+                const firstImg = imagesArray[0] || 'https://placehold.co/400x400';
 
                 grid.innerHTML += `
-                    <div class="product-card bg-slate-50 rounded-2xl p-3 border border-slate-100 shadow-sm cursor-pointer" 
-                         onclick="window.location.href='product.html?id=${id}'" 
-                         data-aos="fade-up">
-                        <div class="mb-3 rounded-xl overflow-hidden aspect-square">
-                            <img src="${firstImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x400?text=Product'">
+                    <div class="product-card p-2" onclick="window.location.href='product.html?id=${id}'" data-aos="fade-up">
+                        <div class="rounded-xl overflow-hidden aspect-square mb-3 relative">
+                            <img src="${firstImg}" class="w-full h-full object-cover">
+                            <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-md shadow-sm">
+                                <span class="text-[8px] font-bold text-slate-800 uppercase">Premium</span>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-[10px] text-slate-800 truncate">${p.name}</h3>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-[10px] font-bold text-blue-600">Rs. ${p.price}</span>
-                            <div class="bg-blue-600 text-white w-7 h-7 rounded-lg text-xs flex items-center justify-center">
-                                <i class="fa-solid fa-eye text-[8px]"></i>
+                        <div class="px-1">
+                            <h3 class="font-bold text-[11px] text-slate-800 truncate mb-1">${p.name}</h3>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-extrabold text-blue-600">Rs. ${p.price}</span>
+                                <div class="bg-blue-50 text-blue-600 p-1.5 rounded-lg">
+                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </div>
                             </div>
                         </div>
                     </div>`;
             });
         });
 
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+
+        window.addEventListener('pageshow', updateCartCount);
+        updateCartCount();
+
         function sendOrder() {
             const name = document.getElementById('userName').value;
             const msg = document.getElementById('userMsg').value;
-            if(!name || !msg) { alert("Please enter name and message"); return; }
-
-            database.ref('orders').push({
-                customerName: name,
-                productName: "General Inquiry",
-                price: "N/A",
-                message: msg,
-                date: new Date().toLocaleString()
-            }).then(() => {
-                window.open(`https://wa.me/923704884772?text=Order Details:%0AName: ${name}%0AMessage: ${msg}`, '_blank');
-            });
+            if(!name || !msg) { alert("Details fill karein"); return; }
+            window.open(`https://wa.me/923704884772?text=Inquiry from ${name}:%0A${msg}`, '_blank');
         }
 
-        AOS.init({ duration: 1000, once: true });
+        AOS.init({ duration: 800, once: true });
     </script>
 </body>
-</html>
+    </html>
+    
