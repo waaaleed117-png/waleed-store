@@ -13,48 +13,45 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
-        html, body { max-width: 100%; overflow-x: hidden; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; background-color: #f8fafc; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        
-        /* Phase 2: Slider Background Blue (Hero) */
-        .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); border-radius: 0 0 2.5rem 2.5rem; }
-
-        /* Slider Image Full Show (No Cutting) */
-        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); aspect-ratio: 16/9; background: #020617; }
-        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.45, 0, 0.55, 1); height: 100%; }
-        .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: contain; background: #020617; }
-
-        /* Trust Badges */
-        .badge-box { background: white; padding: 12px 6px; border-radius: 1.2rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .badge-box i { font-size: 1.1rem; margin-bottom: 5px; color: #2563eb; }
-        .badge-box span { font-size: 8px; font-weight: 700; color: #475569; text-transform: uppercase; }
-
-        /* Premium Product Cards (Reference Style) */
-        .product-card { background: white; border-radius: 1.5rem; border: 1px solid #f1f5f9; transition: all 0.3s ease; display: flex; flex-direction: column; overflow: hidden; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); }
-        
-        /* Add to Cart Blue (Matching Slider BG) */
-        .add-to-cart-btn { background: linear-gradient(to right, #1e40af, #2563eb); color: #fff; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 0.8rem; padding: 12px; width: 100%; text-align: center; margin-top: 10px; }
-        .add-to-cart-btn:active { transform: scale(0.96); }
-
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+        html, body { max-width: 100%; overflow-x: hidden; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+        .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
+        .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-order { animation: pulse-ring 2s infinite !important; }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
+        .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
         
-        .premium-label { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); padding: 2px 8px; border-radius: 6px; font-size: 8px; font-weight: 800; color: #1e3a8a; text-transform: uppercase; }
+        /* --- NEW: Slider & Premium Card Styles --- */
+        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); aspect-ratio: 16/9; background: #000; }
+        .slider-wrapper { display: flex; transition: transform 0.6s ease-in-out; height: 100%; }
+        .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: contain; }
+
+        .badge-box { background: white; padding: 10px 5px; border-radius: 1rem; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .badge-box i { color: #2563eb; font-size: 1.1rem; margin-bottom: 4px; }
+        .badge-box span { font-size: 8px; font-weight: 800; color: #475569; text-transform: uppercase; }
+
+        .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: all 0.3s ease; overflow: hidden; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .add-to-cart-btn { background: #1e3a8a; color: white; width: 100%; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; }
+        /* ---------------------------------------- */
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="bg-white">
 
     <a href="https://wa.me/923704884772" target="_blank" class="fixed-wa">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <nav class="glass fixed w-full top-0 z-50 px-4 py-3 border-b border-slate-100">
+    <nav class="glass fixed w-full top-0 z-50 px-4 py-2 border-b border-slate-100">
         <div class="container mx-auto flex justify-between items-center">
             <a href="#" class="flex items-center space-x-1">
-                <span class="text-xl font-extrabold text-slate-900 uppercase tracking-tighter">Waleed</span>
-                <span class="text-xl font-extrabold text-blue-600 uppercase tracking-tighter">Store</span>
+                <span class="text-xl font-extrabold text-slate-900">Waleed</span>
+                <span class="text-xl font-extrabold text-blue-600">Store</span>
             </a>
             <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
                 <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
@@ -63,61 +60,72 @@
         </div>
     </nav>
 
-    <main class="pt-20">
+    <header class="hero-bg pt-28 pb-12 text-white text-center px-6">
+        <div data-aos="fade-down" class="mb-8">
+            <h1 class="text-4xl font-extrabold mb-3"><span class="premium-text">Premium Quality</span></h1>
+            <p class="text-slate-300 text-sm max-w-xs mx-auto">Your trust is our priority. Order now.</p>
+        </div>
         
-        <header class="hero-bg px-4 py-6 mb-6">
-            <div class="px-0 py-4" data-aos="zoom-in">
-                <div class="slider-container">
-                    <div id="sliderWrapper" class="slider-wrapper">
-                        <img src="https://placehold.co/800x450?text=Loading+Banners..." class="slider-img">
-                    </div>
+        <div class="max-w-md mx-auto px-2" data-aos="zoom-in">
+            <div class="slider-container">
+                <div id="sliderWrapper" class="slider-wrapper">
+                    <img src="https://placehold.co/800x450?text=Loading+Banners..." class="slider-img">
                 </div>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-3 gap-3 px-4 mb-8 -mt-12" data-aos="fade-up">
-            <div class="badge-box">
-                <i class="fa-solid fa-truck-fast"></i>
-                <span>Fast Shipping</span>
-            </div>
-            <div class="badge-box">
-                <i class="fa-solid fa-certificate"></i>
-                <span>100% Original</span>
-            </div>
-            <div class="badge-box">
-                <i class="fa-solid fa-headset"></i>
-                <span>24/7 Support</span>
             </div>
         </div>
+    </header>
 
-        <section id="products" class="px-4 pb-12">
-            <div class="flex justify-between items-end mb-6">
-                <div>
-                    <h2 class="text-xl font-extrabold text-slate-800 uppercase tracking-tight">New Arrivals</h2>
-                    <div class="h-1 w-8 bg-blue-600 rounded-full"></div>
-                </div>
-                <span class="text-xs font-bold text-blue-600">See All</span>
-            </div>
-            
-            <div id="product-grid" class="grid grid-cols-2 gap-4">
-                </div>
-        </section>
+    <div class="grid grid-cols-3 gap-3 px-4 -mt-6 mb-10" data-aos="fade-up">
+        <div class="badge-box">
+            <i class="fa-solid fa-truck-fast"></i>
+            <span>Fast Shipping</span>
+        </div>
+        <div class="badge-box">
+            <i class="fa-solid fa-certificate"></i>
+            <span>100% Original</span>
+        </div>
+        <div class="badge-box">
+            <i class="fa-solid fa-headset"></i>
+            <span>24/7 Support</span>
+        </div>
+    </div>
 
-    </main>
+    <section id="products" class="py-12 px-4">
+        <div class="text-center mb-10">
+            <h2 class="text-2xl font-bold text-slate-800">New Products</h2>
+            <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
+        </div>
+        
+        <div id="product-grid" class="grid grid-cols-2 gap-4">
+            <p class="text-center col-span-2 text-slate-400">Loading products...</p>
+        </div>
+    </section>
 
     <section id="contact" class="py-16 px-6 bg-slate-900 text-white rounded-t-[3rem]">
         <div class="container mx-auto">
-            <h2 class="text-2xl font-bold text-center mb-8">Quick Support</h2>
+            <h2 class="text-2xl font-bold text-center mb-8">Contact us</h2>
             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-10">
                 <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none text-white text-sm mb-4">
-                <textarea id="userMsg" placeholder="Order details or inquiry..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
-                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Message on WhatsApp</button>
+                <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
+                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send to WhatsApp</button>
+            </div>
+            <div class="grid grid-cols-1 gap-8 text-center">
+                <div>
+                    <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-2"></i>
+                    <h4 class="text-xs font-bold text-blue-400 uppercase">Location</h4>
+                    <p class="text-sm opacity-80">Punjab, Pakistan</p>
+                </div>
+                <div>
+                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-2"></i>
+                    <h4 class="text-xs font-bold text-green-400 uppercase">WhatsApp</h4>
+                    <p class="text-sm opacity-80">+92 370 4884772</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer class="py-8 text-center text-slate-500 text-[10px] bg-slate-900 tracking-widest uppercase border-t border-white/5">
-        © 2026 WALEED STORE | OFFICIAL PREMIUM QUALITY
+    <footer class="py-8 text-center text-slate-500 text-[9px] bg-slate-900 tracking-widest uppercase border-t border-white/5">
+        © 2026 WALEED STORE. PROFESSIONAL PREMIUM QUALITY.
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -134,26 +142,36 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // --- SLIDER LOGIC ---
+        // SLIDER FETCH
         let currentSlide = 0;
         database.ref('slider').on('value', (snapshot) => {
             const wrapper = document.getElementById('sliderWrapper');
-            wrapper.innerHTML = "";
-            let images = [];
-            snapshot.forEach(child => {
-                images.push(child.val().url);
-                wrapper.innerHTML += `<img src="${child.val().url}" class="slider-img">`;
-            });
-            
-            if(images.length > 1) {
-                setInterval(() => {
-                    currentSlide = (currentSlide + 1) % images.length;
-                    wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-                }, 5000); 
+            if(snapshot.exists()){
+                wrapper.innerHTML = "";
+                let count = 0;
+                snapshot.forEach(child => {
+                    wrapper.innerHTML += `<img src="${child.val().url}" class="slider-img">`;
+                    count++;
+                });
+                if(count > 1){
+                    setInterval(() => {
+                        currentSlide = (currentSlide + 1) % count;
+                        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+                    }, 4000);
+                }
             }
         });
 
-        // --- PRODUCT GRID LOGIC (PREMIUM) ---
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const countElement = document.getElementById('cart-count');
+            if (countElement) countElement.innerText = cart.length;
+        }
+
+        window.addEventListener('pageshow', updateCartCount);
+        updateCartCount();
+
+        // PRODUCTS FETCH (PREMIUM STYLE)
         database.ref('products').on('value', (snapshot) => {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -161,42 +179,34 @@
                 const p = child.val();
                 const id = child.key;
                 const imagesArray = p.images || [p.image];
-                const firstImg = imagesArray[0] || 'https://placehold.co/400x400';
+                const firstImage = imagesArray[0] || 'https://placehold.co/400x400';
 
                 grid.innerHTML += `
-                    <div class="product-card" onclick="window.location.href='product.html?id=${id}'" data-aos="fade-up">
-                        <div class="m-2 rounded-xl overflow-hidden aspect-square relative bg-slate-50">
-                            <img src="${firstImg}" class="w-full h-full object-cover">
-                            <div class="premium-label">Premium</div>
+                    <div class="product-card p-2" data-aos="fade-up">
+                        <div class="rounded-xl overflow-hidden aspect-square mb-2 relative bg-slate-50" onclick="window.location.href='product.html?id=${id}'">
+                            <img src="${firstImage}" class="w-full h-full object-cover">
                         </div>
-                        <div class="px-3 pb-3">
-                            <h3 class="font-bold text-[11px] text-slate-800 truncate mb-1">${p.name}</h3>
-                            <div class="flex flex-col mb-2">
-                                <span class="text-[9px] text-slate-400 line-through">Rs. ${parseInt(p.price) + 700}</span>
-                                <span class="text-sm font-extrabold text-blue-700">Rs. ${p.price}</span>
+                        <div class="px-1 flex flex-col justify-between flex-grow">
+                            <h3 class="font-bold text-[11px] text-slate-800 truncate">${p.name}</h3>
+                            <div class="mt-1">
+                                <span class="text-[10px] text-slate-400 line-through">Rs. ${parseInt(p.price) + 500}</span>
+                                <div class="text-sm font-extrabold text-blue-600">Rs. ${p.price}</div>
                             </div>
-                            <button class="add-to-cart-btn">Add To Cart</button>
+                            <button onclick="window.location.href='product.html?id=${id}'" class="add-to-cart-btn active:scale-95 transition">Add To Cart</button>
                         </div>
                     </div>`;
             });
         });
 
-        function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            document.getElementById('cart-count').innerText = cart.length;
-        }
-
-        window.addEventListener('pageshow', updateCartCount);
-        updateCartCount();
-
         function sendOrder() {
             const name = document.getElementById('userName').value;
             const msg = document.getElementById('userMsg').value;
-            if(!name || !msg) { alert("Details fill karein"); return; }
-            window.open(`https://wa.me/923704884772?text=Inquiry from ${name}:%0A${msg}`, '_blank');
+            if(!name || !msg) { alert("Please enter name and message"); return; }
+            window.open(`https://wa.me/923704884772?text=Name: ${name}%0AMessage: ${msg}`, '_blank');
         }
 
-        AOS.init({ duration: 800, once: true });
+        AOS.init({ duration: 1000, once: true });
     </script>
 </body>
-</html>
+            </html>
+            
