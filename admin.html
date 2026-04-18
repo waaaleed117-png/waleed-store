@@ -37,6 +37,9 @@
             <button onclick="showSection('add-product')" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
                 <i class="fa-solid fa-plus-circle"></i> Add Product
             </button>
+            <button onclick="showSection('manage-slider')" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
+                <i class="fa-solid fa-images"></i> Manage Slider
+            </button>
             <button onclick="showSection('manage-products')" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
                 <i class="fa-solid fa-list-check"></i> Manage Products
             </button>
@@ -50,6 +53,19 @@
         <div class="flex items-center gap-4 mb-8">
             <button onclick="toggleSidebar()" class="text-2xl p-2 bg-slate-800 rounded-lg"><i class="fa-solid fa-bars-staggered"></i></button>
             <h1 id="page-title" class="text-2xl font-bold">Add Product</h1>
+        </div>
+
+        <div id="manage-slider" class="hidden-section">
+            <div class="glass-card p-6 max-w-xl mx-auto shadow-2xl cursor-default hover:transform-none">
+                <h3 class="text-blue-400 font-bold mb-4">Website Slider Images</h3>
+                <div class="upload-box p-8 rounded-2xl text-center mb-6" onclick="document.getElementById('sliderFileInput').click()">
+                    <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 text-slate-500"></i>
+                    <p class="text-sm text-slate-400" id="sliderUploadStatus">Click to upload banner (Professional Look)</p>
+                    <input type="file" id="sliderFileInput" class="hidden" onchange="uploadSliderImage()">
+                </div>
+                <div id="slider-images-list" class="grid grid-cols-1 gap-4">
+                    </div>
+            </div>
         </div>
 
         <div id="add-product" class="glass-card p-6 max-w-2xl mx-auto shadow-2xl cursor-default hover:transform-none">
@@ -106,7 +122,7 @@
         function showSection(id) {
             document.querySelectorAll('.main-content > div:not(.flex)').forEach(div => div.classList.add('hidden-section'));
             document.getElementById(id).classList.remove('hidden-section');
-            const titles = {'add-product': 'Add Product', 'view-orders': 'Customer Orders', 'manage-products': 'Manage Store'};
+            const titles = {'add-product': 'Add Product', 'view-orders': 'Customer Orders', 'manage-products': 'Manage Store', 'manage-slider': 'Manage Slider'};
             document.getElementById('page-title').innerText = titles[id];
             if(window.innerWidth < 768) toggleSidebar();
         }
@@ -117,6 +133,43 @@
             label.innerHTML = `<i class="fa-solid fa-check-circle mb-1"></i><br>Ready`;
         }
 
+        // --- NEW SLIDER LOGIC ---
+        async function uploadSliderImage() {
+            const file = document.getElementById('sliderFileInput').files[0];
+            const status = document.getElementById('sliderUploadStatus');
+            if(!file) return;
+
+            status.innerHTML = '<div class="loader"></div> Uploading...';
+            try {
+                const formData = new FormData();
+                formData.append("image", file);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, { method: "POST", body: formData });
+                const d = await res.json();
+                
+                await database.ref('slider').push({ url: d.data.url });
+                status.innerText = "Click to upload banner (Professional Look)";
+                alert("Slider Image Uploaded!");
+            } catch (e) {
+                alert("Upload failed!");
+                status.innerText = "Click to upload banner (Professional Look)";
+            }
+        }
+
+        database.ref('slider').on('value', (snapshot) => {
+            const list = document.getElementById('slider-images-list');
+            list.innerHTML = "";
+            snapshot.forEach(child => {
+                list.innerHTML += `
+                    <div class="relative group rounded-xl overflow-hidden">
+                        <img src="${child.val().url}" class="w-full h-32 object-cover border border-slate-700 rounded-xl">
+                        <button onclick="deleteSlider('${child.key}')" class="absolute top-2 right-2 bg-red-600 p-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
+        });
+
+        function deleteSlider(key) { if(confirm("Delete this banner?")) database.ref('slider/' + key).remove(); }
+
+        // --- REST OF YOUR CODE (UNTOUCHED) ---
         database.ref('products').on('value', (snapshot) => {
             const list = document.getElementById('admin-product-list');
             list.innerHTML = "";
