@@ -69,16 +69,26 @@
         </div>
 
         <div id="add-product" class="glass-card p-6 max-w-2xl mx-auto shadow-2xl cursor-default hover:transform-none">
+            <div class="mb-4">
+                <label>Product Name</label>
+                <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter name">
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div><label>Product Name</label><input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter name"></div>
-                <div><label>Price</label><input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter price"></div>
+                <div>
+                    <label>Original Price (With Line)</label>
+                    <input type="number" id="pOldPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 5000">
+                </div>
+                <div>
+                    <label>Sale Price (Actual)</label>
+                    <input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 3500">
+                </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div><label>Delivery Charges</label><input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="200"></div>
                 <div><label>COD Fee</label><input type="number" id="pCod" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="0"></div>
             </div>
             <div class="mb-4"><label>Description</label><textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-24 outline-none" placeholder="Product description..."></textarea></div>
-            <div class="mb-6"><label>YouTube Video Link</label><input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="https://youtube.com/..."></div>
+            <div class="mb-6"><label>YouTube Video Link</label><input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="http://youtube.com/..."></div>
             
             <label>Upload Images (Max 4)</label>
             <div class="grid grid-cols-2 gap-3 mb-8">
@@ -133,19 +143,16 @@
             label.innerHTML = `<i class="fa-solid fa-check-circle mb-1"></i><br>Ready`;
         }
 
-        // --- NEW SLIDER LOGIC ---
         async function uploadSliderImage() {
             const file = document.getElementById('sliderFileInput').files[0];
             const status = document.getElementById('sliderUploadStatus');
             if(!file) return;
-
             status.innerHTML = '<div class="loader"></div> Uploading...';
             try {
                 const formData = new FormData();
                 formData.append("image", file);
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, { method: "POST", body: formData });
                 const d = await res.json();
-                
                 await database.ref('slider').push({ url: d.data.url });
                 status.innerText = "Click to upload banner (Professional Look)";
                 alert("Slider Image Uploaded!");
@@ -169,7 +176,6 @@
 
         function deleteSlider(key) { if(confirm("Delete this banner?")) database.ref('slider/' + key).remove(); }
 
-        // --- REST OF YOUR CODE (UNTOUCHED) ---
         database.ref('products').on('value', (snapshot) => {
             const list = document.getElementById('admin-product-list');
             list.innerHTML = "";
@@ -187,10 +193,13 @@
                 <div class="space-y-3">
                     <div><label>Product Name</label><input type="text" id="eName" value="${p.name}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div><label>Price</label><input type="number" id="ePrice" value="${p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
-                        <div><label>Delivery</label><input type="number" id="eDel" value="${p.delivery || 200}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                        <div><label>Sale Price</label><input type="number" id="ePrice" value="${p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                        <div><label>Original Price</label><input type="number" id="eOldPrice" value="${p.originalPrice || p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
                     </div>
-                    <div><label>COD Fee</label><input type="number" id="eCod" value="${p.cod_fee || 0}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label>Delivery</label><input type="number" id="eDel" value="${p.delivery || 200}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                        <div><label>COD Fee</label><input type="number" id="eCod" value="${p.cod_fee || 0}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
+                    </div>
                     <div><label>Description</label><textarea id="eDesc" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 h-24 outline-none">${p.desc}</textarea></div>
                     <div><label>YouTube Link</label><input type="text" id="eVideo" value="${p.video || ''}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
                     <div class="grid grid-cols-2 gap-2 pt-4">
@@ -205,6 +214,7 @@
             const updates = {
                 name: document.getElementById('eName').value,
                 price: document.getElementById('ePrice').value,
+                originalPrice: document.getElementById('eOldPrice').value,
                 delivery: document.getElementById('eDel').value,
                 cod_fee: document.getElementById('eCod').value,
                 desc: document.getElementById('eDesc').value,
@@ -254,6 +264,7 @@
                 await database.ref('products').push({
                     name: document.getElementById('pName').value,
                     price: document.getElementById('pPrice').value,
+                    originalPrice: document.getElementById('pOldPrice').value, // SAVING ORIGINAL PRICE
                     delivery: document.getElementById('pDelivery').value,
                     cod_fee: document.getElementById('pCod').value,
                     desc: document.getElementById('pDesc').value,
@@ -262,8 +273,4 @@
                     date: new Date().toLocaleString()
                 });
                 alert("Success!"); location.reload();
-            } catch (e) { alert("Error!"); btn.disabled = false; btn.innerText = "Upload Product"; }
-        }
-    </script>
-</body>
-</html>
+            } catch (e) { alert("Error!"); btn.disabled = false; btn.innerText = "U
