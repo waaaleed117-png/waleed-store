@@ -83,9 +83,14 @@
         </div>
 
         <div class="space-y-4">
-            <div class="flex justify-between items-start">
-                <h1 id="pName" class="text-2xl font-bold text-slate-900 leading-tight">Loading...</h1>
-                <span id="pPrice" class="text-xl font-extrabold text-blue-600 whitespace-nowrap ml-4"></span>
+            <div class="flex flex-col">
+                <div class="flex justify-between items-start mb-1">
+                    <h1 id="pName" class="text-2xl font-bold text-slate-900 leading-tight">Loading...</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="pOldPrice" class="text-sm text-slate-400 line-through"></span>
+                    <span id="pPrice" class="text-2xl font-extrabold text-blue-600"></span>
+                </div>
             </div>
 
             <input type="hidden" id="pDeliveryVal" value="200">
@@ -93,7 +98,7 @@
 
             <div class="py-4 border-t border-slate-100">
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Description</h3>
-                <p id="pDesc" class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap"></p>
+                <p id="pDesc" class="text-blue-600 text-sm leading-relaxed whitespace-pre-wrap"></p>
             </div>
 
             <div class="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex gap-3 z-40">
@@ -131,6 +136,10 @@
                 if (p) {
                     document.getElementById('pName').innerText = p.name;
                     document.getElementById('pPrice').innerText = 'Rs. ' + p.price;
+                    // FIXED: Show originalPrice if it exists
+                    if(p.originalPrice) {
+                        document.getElementById('pOldPrice').innerText = 'Rs. ' + p.originalPrice;
+                    }
                     document.getElementById('pDesc').innerText = p.desc;
                     document.getElementById('pDeliveryVal').value = p.delivery || "200";
                     document.getElementById('pCodVal').value = p.cod_fee || "0";
