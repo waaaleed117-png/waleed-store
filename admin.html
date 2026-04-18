@@ -69,26 +69,17 @@
         </div>
 
         <div id="add-product" class="glass-card p-6 max-w-2xl mx-auto shadow-2xl cursor-default hover:transform-none">
-            <div class="mb-4">
-                <label>Product Name</label>
-                <input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter name">
-            </div>
+            <div class="mb-4"><label>Product Name</label><input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter name"></div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label>Original Price (With Line)</label>
-                    <input type="number" id="pOldPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 5000">
-                </div>
-                <div>
-                    <label>Sale Price (Actual)</label>
-                    <input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 3500">
-                </div>
+                <div><label>Original Price (With Line)</label><input type="number" id="pOldPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 5000"></div>
+                <div><label>Sale Price (Actual)</label><input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 3500"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div><label>Delivery Charges</label><input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="200"></div>
                 <div><label>COD Fee</label><input type="number" id="pCod" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="0"></div>
             </div>
             <div class="mb-4"><label>Description</label><textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-24 outline-none" placeholder="Product description..."></textarea></div>
-            <div class="mb-6"><label>YouTube Video Link</label><input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="http://youtube.com/..."></div>
+            <div class="mb-6"><label>YouTube Video Link</label><input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="https://youtube.com/..."></div>
             
             <label>Upload Images (Max 4)</label>
             <div class="grid grid-cols-2 gap-3 mb-8">
@@ -264,7 +255,7 @@
                 await database.ref('products').push({
                     name: document.getElementById('pName').value,
                     price: document.getElementById('pPrice').value,
-                    originalPrice: document.getElementById('pOldPrice').value, // SAVING ORIGINAL PRICE
+                    originalPrice: document.getElementById('pOldPrice').value,
                     delivery: document.getElementById('pDelivery').value,
                     cod_fee: document.getElementById('pCod').value,
                     desc: document.getElementById('pDesc').value,
@@ -273,4 +264,9 @@
                     date: new Date().toLocaleString()
                 });
                 alert("Success!"); location.reload();
-            } catch (e) { alert("Error!"); btn.disabled = false; btn.innerText = "U
+            } catch (e) { alert("Error!"); btn.disabled = false; btn.innerText = "Upload Product"; }
+        }
+    </script>
+</body>
+    </html>
+    
