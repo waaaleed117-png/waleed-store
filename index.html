@@ -19,26 +19,20 @@
         .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        .animate-order { animation: pulse-ring 2s infinite !important; }
-        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
-        .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
         
-        /* --- NEW: Slider & Premium Card Styles --- */
-        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); aspect-ratio: 16/9; background: #000; }
-        .slider-wrapper { display: flex; transition: transform 0.6s ease-in-out; height: 100%; }
-        .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: contain; }
+        /* --- MegaBazar Style Slider (Square 1:1) --- */
+        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: transparent; }
+        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
+        .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: cover; }
 
-        .badge-box { background: white; padding: 10px 5px; border-radius: 1rem; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .badge-box i { color: #2563eb; font-size: 1.1rem; margin-bottom: 4px; }
+        .badge-box { background: white; padding: 12px 5px; border-radius: 1rem; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .badge-box i { color: #2563eb; font-size: 1.2rem; margin-bottom: 4px; }
         .badge-box span { font-size: 8px; font-weight: 800; color: #475569; text-transform: uppercase; }
 
         .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: all 0.3s ease; overflow: hidden; display: flex; flex-direction: column; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .add-to-cart-btn { background: #1e3a8a; color: white; width: 100%; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; }
-        /* ---------------------------------------- */
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
     </style>
 </head>
 <body class="bg-white">
@@ -60,28 +54,28 @@
         </div>
     </nav>
 
-    <header class="hero-bg pt-28 pb-12 text-white text-center px-6">
-        <div data-aos="fade-down" class="mb-8">
-            <h1 class="text-4xl font-extrabold mb-3"><span class="premium-text">Premium Quality</span></h1>
-            <p class="text-slate-300 text-sm max-w-xs mx-auto">Your trust is our priority. Order now.</p>
+    <header class="hero-bg pt-24 pb-16 text-white text-center px-4">
+        <div data-aos="fade-down" class="mb-6">
+            <h1 class="text-3xl font-extrabold mb-2"><span class="premium-text">Premium Quality</span></h1>
+            <p class="text-slate-300 text-xs opacity-80">Your trust is our priority. Order now.</p>
         </div>
         
-        <div class="max-w-md mx-auto px-2" data-aos="zoom-in">
+        <div class="max-w-sm mx-auto" data-aos="zoom-in">
             <div class="slider-container">
                 <div id="sliderWrapper" class="slider-wrapper">
-                    <img src="https://placehold.co/800x450?text=Loading+Banners..." class="slider-img">
+                    <img src="https://placehold.co/1080x1080?text=Loading+Banners..." class="slider-img">
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="grid grid-cols-3 gap-3 px-4 -mt-6 mb-10" data-aos="fade-up">
+    <div class="grid grid-cols-3 gap-3 px-4 -mt-8 mb-10" data-aos="fade-up">
         <div class="badge-box">
             <i class="fa-solid fa-truck-fast"></i>
             <span>Fast Shipping</span>
         </div>
         <div class="badge-box">
-            <i class="fa-solid fa-certificate"></i>
+            <i class="fa-solid fa-shield-halved"></i>
             <span>100% Original</span>
         </div>
         <div class="badge-box">
@@ -90,15 +84,14 @@
         </div>
     </div>
 
-    <section id="products" class="py-12 px-4">
-        <div class="text-center mb-10">
+    <section id="products" class="py-8 px-4">
+        <div class="text-center mb-8">
             <h2 class="text-2xl font-bold text-slate-800">New Products</h2>
             <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
         </div>
         
         <div id="product-grid" class="grid grid-cols-2 gap-4">
-            <p class="text-center col-span-2 text-slate-400">Loading products...</p>
-        </div>
+            </div>
     </section>
 
     <section id="contact" class="py-16 px-6 bg-slate-900 text-white rounded-t-[3rem]">
@@ -125,7 +118,7 @@
     </section>
 
     <footer class="py-8 text-center text-slate-500 text-[9px] bg-slate-900 tracking-widest uppercase border-t border-white/5">
-        © 2026 WALEED STORE. PROFESSIONAL PREMIUM QUALITY.
+        © 2026 WALEED STORE. OFFICIAL PREMIUM QUALITY.
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -142,7 +135,6 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // SLIDER FETCH
         let currentSlide = 0;
         database.ref('slider').on('value', (snapshot) => {
             const wrapper = document.getElementById('sliderWrapper');
@@ -171,7 +163,6 @@
         window.addEventListener('pageshow', updateCartCount);
         updateCartCount();
 
-        // PRODUCTS FETCH (PREMIUM STYLE)
         database.ref('products').on('value', (snapshot) => {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -208,5 +199,4 @@
         AOS.init({ duration: 1000, once: true });
     </script>
 </body>
-            </html>
-            
+</html>
