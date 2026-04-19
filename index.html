@@ -56,6 +56,10 @@
         .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
         .brand-icon { width: 28px; height: 28px; margin-bottom: 1px; }
         .brand-name { font-size: 13px; font-weight: 900; line-height: 1; display: flex; align-items: center; letter-spacing: -0.5px; }
+
+        /* Quantity Controls Styling */
+        .qty-btn { background: #f1f5f9; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .qty-input { width: 25px; text-align: center; font-size: 12px; font-weight: 700; }
     </style>
 </head>
 <body class="bg-white">
@@ -289,10 +293,23 @@
 
         function addToCart(id, name, price, img) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart.push({ id, name, price, img });
+            let existingItem = cart.find(item => item.id === id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ id, name, price, img, quantity: 1 });
+            }
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
             toggleCart();
+        }
+
+        function updateQuantity(index, change) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart[index].quantity += change;
+            if (cart[index].quantity < 1) cart[index].quantity = 1;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
         }
 
         function removeFromCart(index) {
@@ -310,13 +327,19 @@
             container.innerHTML = cart.length === 0 ? '<p class="text-center text-slate-400 mt-10">Cart is empty</p>' : '';
             let total = 0;
             cart.forEach((item, index) => {
-                total += parseInt(item.price);
+                total += parseInt(item.price) * item.quantity;
                 container.innerHTML += `
                     <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl">
                         <img src="${item.img}" class="w-16 h-16 object-cover rounded-lg">
                         <div class="flex-grow">
                             <h4 class="font-bold text-[11px] truncate w-32">${item.name}</h4>
                             <p class="text-blue-600 font-bold text-xs">Rs. ${item.price}</p>
+                            
+                            <div class="flex items-center mt-1 gap-2">
+                                <button onclick="updateQuantity(${index}, -1)" class="qty-btn"> - </button>
+                                <span class="qty-input">${item.quantity}</span>
+                                <button onclick="updateQuantity(${index}, 1)" class="qty-btn"> + </button>
+                            </div>
                         </div>
                         <button onclick="removeFromCart(${index})"><i class="fa-solid fa-trash-can text-red-400 text-sm"></i></button>
                     </div>`;
@@ -327,7 +350,10 @@
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const countEl = document.getElementById('cart-count');
-            if(countEl) countEl.innerText = cart.length;
+            if(countEl) {
+                let totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+                countEl.innerText = totalItems;
+            }
         }
 
         updateCartCount();
