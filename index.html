@@ -20,12 +20,13 @@
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
-        /* IMPROVED SLIDER STYLES */
-        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: transparent; touch-action: pan-y; }
-        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; will-change: transform; }
-        .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        /* PROFESSIONAL FADE SLIDER */
+        .slider-container { width: 100%; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; overflow: hidden; background: #000; }
+        .slider-wrapper { position: relative; width: 100%; height: 100%; }
+        .slider-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out, transform 1.2s ease-in-out; transform: scale(1.05); pointer-events: none; }
+        .slider-img.active { opacity: 1; transform: scale(1); pointer-events: auto; }
 
-        /* DOTS STYLING */
+        /* DOTS INDICATOR */
         .dots-container { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: all 0.3s ease; cursor: pointer; }
         .dot.active { background: #3b82f6; width: 20px; border-radius: 10px; }
@@ -97,31 +98,7 @@
             <h2 class="text-2xl font-bold text-slate-800">New Products</h2>
             <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
         </div>
-        
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
-    </section>
-
-    <section id="contact" class="py-16 px-6 bg-slate-900 text-white rounded-t-[3rem]">
-        <div class="container mx-auto text-center">
-            <h2 class="text-2xl font-bold mb-8">Contact us</h2>
-            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-10 text-left">
-                <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none text-white text-sm mb-4">
-                <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
-                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send to WhatsApp</button>
-            </div>
-            <div class="grid grid-cols-1 gap-8">
-                <div>
-                    <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-2"></i>
-                    <h4 class="text-xs font-bold text-blue-400 uppercase">Location</h4>
-                    <p class="text-sm opacity-80">Punjab, Pakistan</p>
-                </div>
-                <div>
-                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-2"></i>
-                    <h4 class="text-xs font-bold text-green-400 uppercase">WhatsApp</h4>
-                    <p class="text-sm opacity-80">+92 370 4884772</p>
-                </div>
-            </div>
-        </div>
     </section>
 
     <footer class="py-8 text-center text-slate-500 text-[9px] bg-slate-900 tracking-widest uppercase border-t border-white/5">
@@ -142,7 +119,6 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // IMPROVED SLIDER SCRIPT
         let currentSlide = 0;
         let imagesCount = 0;
         let sliderTimer;
@@ -153,28 +129,35 @@
             if(snapshot.exists()){
                 wrapper.innerHTML = "";
                 dotsContainer.innerHTML = "";
-                let slidesHTML = "";
-                let dotsHTML = "";
                 let index = 0;
                 
                 snapshot.forEach(child => {
-                    slidesHTML += `<img src="${child.val().url}" class="slider-img">`;
-                    dotsHTML += `<div class="dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></div>`;
+                    const img = document.createElement('img');
+                    img.src = child.val().url;
+                    img.className = `slider-img ${index === 0 ? 'active' : ''}`;
+                    wrapper.appendChild(img);
+
+                    const dot = document.createElement('div');
+                    dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                    dot.onclick = () => goToSlide(index);
+                    dotsContainer.appendChild(dot);
                     index++;
                 });
 
                 imagesCount = index;
-                wrapper.innerHTML = slidesHTML;
-                dotsContainer.innerHTML = dotsHTML;
-
                 startAutoSlide();
-                setupTouchSupport();
+                setupSwipeSupport();
             }
         });
 
         function updateSlider() {
-            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            const imgs = document.querySelectorAll('.slider-img');
             const dots = document.querySelectorAll('.dot');
+            
+            imgs.forEach((img, i) => {
+                img.classList.toggle('active', i === currentSlide);
+            });
+            
             dots.forEach((dot, i) => {
                 dot.classList.toggle('active', i === currentSlide);
             });
@@ -201,30 +184,26 @@
             startAutoSlide();
         }
 
-        // TOUCH SUPPORT FOR SWIPING
-        function setupTouchSupport() {
+        function setupSwipeSupport() {
             let startX = 0;
             const container = document.getElementById('sliderMain');
 
             container.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
                 clearInterval(sliderTimer);
-            });
+            }, {passive: true});
 
             container.addEventListener('touchend', (e) => {
                 let endX = e.changedTouches[0].clientX;
                 let diff = startX - endX;
 
                 if (Math.abs(diff) > 50) {
-                    if (diff > 0) { // Swipe Left -> Next
-                        currentSlide = (currentSlide + 1) % imagesCount;
-                    } else { // Swipe Right -> Prev
-                        currentSlide = (currentSlide - 1 + imagesCount) % imagesCount;
-                    }
+                    if (diff > 0) currentSlide = (currentSlide + 1) % imagesCount;
+                    else currentSlide = (currentSlide - 1 + imagesCount) % imagesCount;
                     updateSlider();
                 }
                 startAutoSlide();
-            });
+            }, {passive: true});
         }
 
         function addToCart(id, name, price, img) {
@@ -239,7 +218,6 @@
             document.getElementById('cart-count').innerText = cart.length;
         }
 
-        window.addEventListener('pageshow', updateCartCount);
         updateCartCount();
 
         database.ref('products').on('value', (snapshot) => {
@@ -250,8 +228,6 @@
                 const id = child.key;
                 const imagesArray = p.images || [p.image];
                 const firstImage = imagesArray[0] || 'https://placehold.co/400x400';
-                const displayOldPrice = p.originalPrice || p.price;
-
                 grid.innerHTML += `
                     <div class="product-card p-2" data-aos="fade-up">
                         <div class="rounded-xl overflow-hidden aspect-square mb-2 relative bg-slate-50" onclick="window.location.href='product.html?id=${id}'">
@@ -260,7 +236,7 @@
                         <div class="px-1 flex flex-col justify-between flex-grow">
                             <h3 class="font-bold text-[11px] text-slate-800 truncate">${p.name}</h3>
                             <div class="mt-1">
-                                <span class="text-[10px] text-slate-400 line-through">Rs. ${displayOldPrice}</span>
+                                <span class="text-[10px] text-slate-400 line-through">Rs. ${p.originalPrice || p.price}</span>
                                 <div class="text-sm font-extrabold text-blue-600">Rs. ${p.price}</div>
                             </div>
                             <button onclick="addToCart('${id}', '${p.name}', '${p.price}', '${firstImage}')" class="add-to-cart-btn active:scale-95 transition">Add To Cart</button>
@@ -268,13 +244,6 @@
                     </div>`;
             });
         });
-
-        function sendOrder() {
-            const name = document.getElementById('userName').value;
-            const msg = document.getElementById('userMsg').value;
-            if(!name || !msg) { alert("Please enter name and message"); return; }
-            window.open(`https://wa.me/923704884772?text=Name: ${name}%0AMessage: ${msg}`, '_blank');
-        }
 
         AOS.init({ duration: 1000, once: true });
     </script>
