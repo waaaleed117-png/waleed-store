@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -365,4 +366,11 @@
         function sendOrder() {
             const name = document.getElementById('userName').value;
             const msg = document.getElementById('userMsg').value;
-            if(!name || !msg) { alert("Please enter name and message"); retu
+            if(!name || !msg) { alert("Please enter name and message"); return; }
+            window.open(`https://wa.me/923704884772?text=Name: ${name}%0AMessage: ${msg}`, '_blank');
+        }
+
+        AOS.init({ duration: 1000, once: true });
+    </script>
+</body>
+</html>
