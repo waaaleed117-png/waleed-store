@@ -20,6 +20,12 @@
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
+        /* SIDE CART DRAWER */
+        #side-cart { position: fixed; top: 0; right: -100%; width: 85%; max-width: 400px; height: 100%; background: white; z-index: 1000; transition: 0.4s ease-in-out; box-shadow: -10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        #side-cart.active { right: 0; }
+        .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .cart-overlay.active { display: block; }
+
         /* PREMIUM FADE SLIDER */
         .slider-container { width: 100%; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #020617; overflow: hidden; cursor: pointer; }
         .slider-wrapper { position: relative; width: 100%; height: 100%; }
@@ -51,6 +57,23 @@
 </head>
 <body class="bg-white">
 
+    <div class="cart-overlay" onclick="toggleCart()"></div>
+    <div id="side-cart">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="font-bold text-lg">Your Cart</h2>
+            <button onclick="toggleCart()"><i class="fa-solid fa-xmark text-xl text-slate-400"></i></button>
+        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-4">
+            </div>
+        <div class="p-4 border-t bg-slate-50">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-slate-500 font-semibold">Total:</span>
+                <span id="cart-total" class="font-bold text-blue-600">Rs. 0</span>
+            </div>
+            <button onclick="window.location.href='checkout.html'" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest active:scale-95 transition">Check Out</button>
+        </div>
+    </div>
+
     <a href="https://wa.me/923704884772" target="_blank" class="fixed-wa">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
@@ -61,7 +84,7 @@
                 <span class="text-xl font-extrabold text-slate-900">Waleed</span>
                 <span class="text-xl font-extrabold text-blue-600">Store</span>
             </a>
-            <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
+            <div class="relative p-1 cursor-pointer" onclick="toggleCart()">
                 <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
                 <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
             </div>
@@ -214,11 +237,50 @@
             }, {passive: true});
         }
 
+        // CART LOGIC
+        function toggleCart() {
+            document.getElementById('side-cart').classList.toggle('active');
+            document.querySelector('.cart-overlay').classList.toggle('active');
+            renderCart();
+        }
+
         function addToCart(id, name, price, img) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             cart.push({ id, name, price, img });
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
+            toggleCart(); // Open cart when item added
+        }
+
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            renderCart();
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            container.innerHTML = cart.length === 0 ? '<p class="text-center text-slate-400 mt-10">Cart is empty</p>' : '';
+            
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += parseInt(item.price);
+                container.innerHTML += `
+                    <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl">
+                        <img src="${item.img}" class="w-16 h-16 object-cover rounded-lg">
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-[11px] truncate w-32">${item.name}</h4>
+                            <p class="text-blue-600 font-bold text-xs">Rs. ${item.price}</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})"><i class="fa-solid fa-trash-can text-red-400 text-sm"></i></button>
+                    </div>
+                `;
+            });
+            totalEl.innerText = `Rs. ${total}`;
         }
 
         function updateCartCount() {
