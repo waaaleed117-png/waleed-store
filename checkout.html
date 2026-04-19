@@ -16,6 +16,10 @@
         .upload-dashed:hover { border-color: #2563eb; background: #f8fafc; }
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Main web jaisa style buttons ke liye */
+        .qty-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 8px; font-weight: bold; font-size: 16px; transition: 0.2s; }
+        .qty-btn:active { background: #e2e8f0; transform: scale(0.9); }
     </style>
 </head>
 <body class="bg-slate-50 pb-32">
@@ -167,7 +171,7 @@
             container.innerHTML = '';
             
             cart.forEach((item, index) => {
-                const priceNum = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
+                const priceNum = parseInt(item.price.toString().replace(/[^\d]/g, '')) || 0;
                 const qty = item.quantity || 1;
                 subtotal += (priceNum * qty);
                 deliveryTotal += (parseInt(item.deliveryCharges) || 0);
@@ -177,17 +181,18 @@
 
                 container.innerHTML += `
                 <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <img src="${item.img}" class="w-14 h-14 rounded-xl object-cover">
+                    <img src="${item.img}" class="w-16 h-16 rounded-xl object-cover">
                     <div class="flex-1">
                         <div class="text-[12px] font-bold text-slate-800 line-clamp-1">${item.name}</div>
                         <div class="mt-0.5">
                             ${originalPriceTag}
                             <div class="text-blue-600 font-extrabold text-[13px]">${item.price}</div>
                         </div>
+                        
                         <div class="flex items-center gap-3 mt-2">
-                            <button onclick="updateQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs font-bold">-</button>
-                            <span class="text-xs font-bold text-slate-700">${qty}</span>
-                            <button onclick="updateQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs font-bold">+</button>
+                            <button onclick="updateQty(${index}, -1)" class="qty-btn text-slate-600">-</button>
+                            <span class="text-sm font-bold text-slate-800">${qty}</span>
+                            <button onclick="updateQty(${index}, 1)" class="qty-btn text-blue-600">+</button>
                         </div>
                     </div>
                     <button onclick="removeItem(${index})" class="text-red-400 p-2 active:scale-90 transition"><i class="fa-solid fa-trash-can"></i></button>
