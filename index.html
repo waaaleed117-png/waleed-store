@@ -35,7 +35,7 @@
         .slider-img.active { opacity: 1; z-index: 10; }
 
         .dots-container { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: pointer; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: default; }
         .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; }
 
         .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
@@ -168,7 +168,6 @@
                     
                     const dot = document.createElement('div');
                     dot.className = `dot ${index === 0 ? 'active' : ''}`;
-                    dot.onclick = (e) => { e.stopPropagation(); goToSlide(index); };
                     dotsWrapper.appendChild(dot);
                     index++;
                 });
@@ -186,15 +185,11 @@
         }
 
         function nextSlide() {
-            currentSlide = (currentSlide + 1) % imagesCount;
-            updateSlider();
-            startAutoSlide();
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            updateSlider();
-            startAutoSlide();
+            if(imagesCount > 0) {
+                currentSlide = (currentSlide + 1) % imagesCount;
+                updateSlider();
+                startAutoSlide();
+            }
         }
 
         function startAutoSlide() {
