@@ -163,50 +163,36 @@
 
         function loadCheckout() {
             const container = document.getElementById('checkout-items');
-            let subtotal = 0; 
-            let deliveryTotal = 0; 
-            codTotalFee = 0;
-            
+            let subtotal = 0; let deliveryTotal = 0; codTotalFee = 0;
             container.innerHTML = '';
             
-            // Checking if cart is empty
-            if (cart.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">Your cart is empty.</p>';
-                updateTotals(0, 0, 0);
-                return;
-            }
-
-            // Loop through each product in the cart
             cart.forEach((item, index) => {
                 const priceNum = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
                 subtotal += priceNum;
                 deliveryTotal += parseInt(item.deliveryCharges) || 0;
                 codTotalFee += parseInt(item.codFee) || 0;
                 
-                const originalPriceTag = item.originalPrice ? `<span class="text-[9px] text-slate-400 line-through mr-2">Rs. ${item.originalPrice}</span>` : '';
+                // FIXED: Display originalPrice with line-through on top of current price
+                const originalPriceTag = item.originalPrice ? `<span class="text-[10px] text-slate-400 line-through block">Rs. ${item.originalPrice}</span>` : '';
 
                 container.innerHTML += `
-                <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                    <img src="${item.img}" class="w-12 h-12 rounded-lg object-cover">
+                <div class="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <img src="${item.img}" class="w-14 h-14 rounded-xl object-cover">
                     <div class="flex-1">
-                        <div class="text-[11px] font-bold text-slate-800 line-clamp-1">${item.name}</div>
-                        <div class="flex items-center">
+                        <div class="text-[12px] font-bold text-slate-800 line-clamp-1">${item.name}</div>
+                        <div class="mt-0.5">
                             ${originalPriceTag}
-                            <div class="text-blue-600 font-bold text-[10px]">${item.price}</div>
+                            <div class="text-blue-600 font-extrabold text-[13px]">${item.price}</div>
                         </div>
                     </div>
-                    <button onclick="removeItem(${index})" class="text-red-400 p-2"><i class="fa-solid fa-trash-can"></i></button>
+                    <button onclick="removeItem(${index})" class="text-red-400 p-2 active:scale-90 transition"><i class="fa-solid fa-trash-can"></i></button>
                 </div>`;
             });
             
-            updateTotals(subtotal, deliveryTotal, codTotalFee);
-        }
-
-        function updateTotals(sub, del, cod) {
-            baseTotal = sub + del;
-            document.getElementById('subtotal').innerText = 'Rs. ' + sub;
-            document.getElementById('delivery-total').innerText = 'Rs. ' + del;
-            document.getElementById('cod-total-display').innerText = '+ Rs. ' + cod;
+            baseTotal = subtotal + deliveryTotal;
+            document.getElementById('subtotal').innerText = 'Rs. ' + subtotal;
+            document.getElementById('delivery-total').innerText = 'Rs. ' + deliveryTotal;
+            document.getElementById('cod-total-display').innerText = '+ Rs. ' + codTotalFee;
             togglePaymentUI();
         }
 
@@ -221,27 +207,15 @@
             const advanceBox = document.getElementById('advance-details');
             const codRow = document.getElementById('cod-row');
             const grandTotalDisplay = document.getElementById('grand-total');
-            if(method === 'cod') { 
-                advanceBox.classList.add('hidden'); 
-                codRow.classList.remove('hidden'); 
-                grandTotalDisplay.innerText = 'Rs. ' + (baseTotal + codTotalFee); 
-            }
-            else { 
-                advanceBox.classList.remove('hidden'); 
-                codRow.classList.add('hidden'); 
-                grandTotalDisplay.innerText = 'Rs. ' + baseTotal; 
-            }
+            if(method === 'cod') { advanceBox.classList.add('hidden'); codRow.classList.remove('hidden'); grandTotalDisplay.innerText = 'Rs. ' + (baseTotal + codTotalFee); }
+            else { advanceBox.classList.remove('hidden'); codRow.classList.add('hidden'); grandTotalDisplay.innerText = 'Rs. ' + baseTotal; }
         }
 
         function previewSS() {
             const file = document.getElementById('ssUpload').files[0];
             if(file) {
                 const reader = new FileReader();
-                reader.onload = (e) => { 
-                    document.getElementById('ssPreview').src = e.target.result; 
-                    document.getElementById('upload-placeholder').classList.add('hidden'); 
-                    document.getElementById('preview-area').classList.remove('hidden'); 
-                };
+                reader.onload = (e) => { document.getElementById('ssPreview').src = e.target.result; document.getElementById('upload-placeholder').classList.add('hidden'); document.getElementById('preview-area').classList.remove('hidden'); };
                 reader.readAsDataURL(file);
             }
         }
@@ -255,7 +229,6 @@
             const ssFile = document.getElementById('ssUpload').files[0];
             const btn = document.getElementById('orderBtn');
 
-            if(cart.length === 0) return alert("Your cart is empty!");
             if(!name || !phone || !city || !address) return alert("All fields are required!");
             if(method === 'advance' && !ssFile) return alert("Screenshot required for advance payment!");
 
@@ -286,13 +259,10 @@
 
                 localStorage.removeItem('cart');
                 window.location.href = `https://wa.me/923704884772?text=${waText}`;
-            } catch(e) { 
-                alert("Error placing order!"); 
-                btn.disabled = false; 
-                btn.innerHTML = 'Confirm Order'; 
-            }
+            } catch(e) { alert("Error placing order!"); btn.disabled = false; btn.innerHTML = 'Confirm Order'; }
         }
         loadCheckout();
     </script>
 </body>
-</html>
+    </html>
+    
