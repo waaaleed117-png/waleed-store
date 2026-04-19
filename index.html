@@ -30,7 +30,7 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
         .overlay.active { display: block; }
 
-        .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; }
+        .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; color: #1e293b; }
         .nav-btn:active { background: #f8fafc; color: #2563eb; }
 
         /* PREMIUM FADE SLIDER */
@@ -67,13 +67,13 @@
     <div class="overlay" id="main-overlay" onclick="closeAllDrawers()"></div>
 
     <div id="side-menu">
-        <div class="p-6 border-b flex justify-between items-center bg-slate-900 text-white">
-            <h2 class="font-bold text-lg">Menu</h2>
+        <div class="p-6 border-b flex justify-between items-center bg-blue-600 text-white">
+            <h2 class="font-bold text-lg tracking-tight">Menu</h2>
             <button onclick="closeAllDrawers()"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
         <div class="flex flex-col p-2">
-            <button onclick="scrollToSection('top')" class="nav-btn"><i class="fa-solid fa-house mr-3"></i> Home</button>
-            <button onclick="scrollToSection('contact')" class="nav-btn"><i class="fa-solid fa-envelope mr-3"></i> Contact Us</button>
+            <button onclick="scrollToSection('top')" class="nav-btn"><i class="fa-solid fa-house mr-3 text-blue-600"></i> Home</button>
+            <button onclick="scrollToSection('contact')" class="nav-btn"><i class="fa-solid fa-envelope mr-3 text-blue-600"></i> Contact Us</button>
         </div>
     </div>
 
@@ -100,7 +100,7 @@
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleMenu()" class="p-2">
-                    <i class="fa-solid fa-ellipsis-vertical text-xl text-slate-700"></i>
+                    <i class="fa-solid fa-bars-staggered text-xl text-blue-600"></i>
                 </button>
             </div>
 
