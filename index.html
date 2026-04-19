@@ -219,5 +219,64 @@
                     if (diff > 0) { // Swipe Left -> Next
                         currentSlide = (currentSlide + 1) % imagesCount;
                     } else { // Swipe Right -> Prev
-                        currentSlide = (currentSlide - 1 + images
-        
+                        currentSlide = (currentSlide - 1 + imagesCount) % imagesCount;
+                    }
+                    updateSlider();
+                }
+                startAutoSlide();
+            });
+        }
+
+        function addToCart(id, name, price, img) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.push({ id, name, price, img });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+
+        window.addEventListener('pageshow', updateCartCount);
+        updateCartCount();
+
+        database.ref('products').on('value', (snapshot) => {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            snapshot.forEach((child) => {
+                const p = child.val();
+                const id = child.key;
+                const imagesArray = p.images || [p.image];
+                const firstImage = imagesArray[0] || 'https://placehold.co/400x400';
+                const displayOldPrice = p.originalPrice || p.price;
+
+                grid.innerHTML += `
+                    <div class="product-card p-2" data-aos="fade-up">
+                        <div class="rounded-xl overflow-hidden aspect-square mb-2 relative bg-slate-50" onclick="window.location.href='product.html?id=${id}'">
+                            <img src="${firstImage}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="px-1 flex flex-col justify-between flex-grow">
+                            <h3 class="font-bold text-[11px] text-slate-800 truncate">${p.name}</h3>
+                            <div class="mt-1">
+                                <span class="text-[10px] text-slate-400 line-through">Rs. ${displayOldPrice}</span>
+                                <div class="text-sm font-extrabold text-blue-600">Rs. ${p.price}</div>
+                            </div>
+                            <button onclick="addToCart('${id}', '${p.name}', '${p.price}', '${firstImage}')" class="add-to-cart-btn active:scale-95 transition">Add To Cart</button>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        function sendOrder() {
+            const name = document.getElementById('userName').value;
+            const msg = document.getElementById('userMsg').value;
+            if(!name || !msg) { alert("Please enter name and message"); return; }
+            window.open(`https://wa.me/923704884772?text=Name: ${name}%0AMessage: ${msg}`, '_blank');
+        }
+
+        AOS.init({ duration: 1000, once: true });
+    </script>
+</body>
+</html>
