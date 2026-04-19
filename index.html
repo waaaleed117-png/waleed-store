@@ -57,6 +57,11 @@
         .add-to-cart-btn { background: #1e3a8a; color: white; width: 100%; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; cursor: pointer; }
         
         .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+
+        /* Custom Logo Styling */
+        .logo-container { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+        .logo-icon { width: 26px; height: 26px; margin-bottom: 2px; }
+        .logo-text { display: flex; align-items: center; font-size: 13px; font-weight: 800; letter-spacing: -0.3px; margin-top: 1px; }
     </style>
 </head>
 <body class="bg-white">
@@ -93,7 +98,7 @@
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <nav class="glass fixed w-full top-0 z-50 px-4 py-2 border-b border-slate-100">
+    <nav class="glass fixed w-full top-0 z-50 px-4 py-1 border-b border-slate-100">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleMenu()" class="p-2">
@@ -101,9 +106,16 @@
                 </button>
             </div>
             <div class="flex justify-center">
-                <a href="#" class="flex items-center space-x-1">
-                    <span class="text-xl font-extrabold text-slate-900">Waleed</span>
-                    <span class="text-xl font-extrabold text-blue-600">Store</span>
+                <a href="#" class="logo-container">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 6H21" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="logo-text">
+                        <span class="text-slate-900">Waleed</span>
+                        <span class="text-blue-600 ml-1">Store</span>
+                    </div>
                 </a>
             </div>
             <div class="flex justify-end">
@@ -353,12 +365,4 @@
         function sendOrder() {
             const name = document.getElementById('userName').value;
             const msg = document.getElementById('userMsg').value;
-            if(!name || !msg) { alert("Please enter name and message"); return; }
-            window.open(`https://wa.me/923704884772?text=Name: ${name}%0AMessage: ${msg}`, '_blank');
-        }
-
-        AOS.init({ duration: 1000, once: true });
-    </script>
-</body>
-                                     </html>
-    
+            if(!name || !msg) 
