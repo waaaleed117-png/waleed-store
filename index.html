@@ -20,9 +20,14 @@
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
-        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: transparent; }
-        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
+        /* PREMIUM SLIDER WITH DOTS & SPRING EFFECT */
+        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #000; }
+        .slider-wrapper { display: flex; transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); height: 100%; }
         .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: cover; }
+
+        .dots-container { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+        .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
 
         .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .badge-box i { font-size: 1.3rem; margin-bottom: 4px; color: #2563eb; } 
@@ -62,9 +67,9 @@
         
         <div class="max-w-sm mx-auto" data-aos="zoom-in">
             <div class="slider-container">
-                <div id="sliderWrapper" class="slider-wrapper">
-                    </div>
+                <div id="sliderWrapper" class="slider-wrapper"></div>
             </div>
+            <div id="dotsWrapper" class="dots-container"></div>
         </div>
     </header>
 
@@ -91,7 +96,6 @@
             <h2 class="text-2xl font-bold text-slate-800">New Products</h2>
             <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
         </div>
-        
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
     </section>
 
@@ -137,23 +141,50 @@
         const database = firebase.database();
 
         let currentSlide = 0;
+        let imagesCount = 0;
+        let autoSlideTimer;
+
         database.ref('slider').on('value', (snapshot) => {
             const wrapper = document.getElementById('sliderWrapper');
+            const dotsWrapper = document.getElementById('dotsWrapper');
             if(snapshot.exists()){
                 wrapper.innerHTML = "";
-                let count = 0;
+                dotsWrapper.innerHTML = "";
+                let index = 0;
                 snapshot.forEach(child => {
                     wrapper.innerHTML += `<img src="${child.val().url}" class="slider-img">`;
-                    count++;
+                    dotsWrapper.innerHTML += `<div class="dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></div>`;
+                    index++;
                 });
-                if(count > 1){
-                    setInterval(() => {
-                        currentSlide = (currentSlide + 1) % count;
-                        wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-                    }, 4000);
-                }
+                imagesCount = index;
+                startAutoSlide();
             }
         });
+
+        function updateSlider() {
+            const wrapper = document.getElementById('sliderWrapper');
+            const dots = document.querySelectorAll('.dot');
+            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlider();
+            startAutoSlide(); // Reset timer on manual click
+        }
+
+        function startAutoSlide() {
+            clearInterval(autoSlideTimer);
+            if(imagesCount > 1) {
+                autoSlideTimer = setInterval(() => {
+                    currentSlide = (currentSlide + 1) % imagesCount;
+                    updateSlider();
+                }, 4000);
+            }
+        }
 
         function addToCart(id, name, price, img) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -164,7 +195,8 @@
 
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            document.getElementById('cart-count').innerText = cart.length;
+            const countEl = document.getElementById('cart-count');
+            if(countEl) countEl.innerText = cart.length;
         }
 
         window.addEventListener('pageshow', updateCartCount);
@@ -178,8 +210,6 @@
                 const id = child.key;
                 const imagesArray = p.images || [p.image];
                 const firstImage = imagesArray[0] || 'https://placehold.co/400x400';
-                
-                // FIXED: Use originalPrice from database, fallback to price if not available
                 const displayOldPrice = p.originalPrice || p.price;
 
                 grid.innerHTML += `
