@@ -168,11 +168,11 @@
             
             cart.forEach((item, index) => {
                 const priceNum = parseInt(item.price.replace(/[^\d]/g, '')) || 0;
-                subtotal += priceNum;
-                deliveryTotal += parseInt(item.deliveryCharges) || 0;
-                codTotalFee += parseInt(item.codFee) || 0;
+                const qty = item.quantity || 1;
+                subtotal += (priceNum * qty);
+                deliveryTotal += (parseInt(item.deliveryCharges) || 0);
+                codTotalFee += (parseInt(item.codFee) || 0);
                 
-                // FIXED: Display originalPrice with line-through on top of current price
                 const originalPriceTag = item.originalPrice ? `<span class="text-[10px] text-slate-400 line-through block">Rs. ${item.originalPrice}</span>` : '';
 
                 container.innerHTML += `
@@ -184,6 +184,11 @@
                             ${originalPriceTag}
                             <div class="text-blue-600 font-extrabold text-[13px]">${item.price}</div>
                         </div>
+                        <div class="flex items-center gap-3 mt-2">
+                            <button onclick="updateQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs font-bold">-</button>
+                            <span class="text-xs font-bold text-slate-700">${qty}</span>
+                            <button onclick="updateQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center bg-white border border-slate-200 rounded-md text-xs font-bold">+</button>
+                        </div>
                     </div>
                     <button onclick="removeItem(${index})" class="text-red-400 p-2 active:scale-90 transition"><i class="fa-solid fa-trash-can"></i></button>
                 </div>`;
@@ -194,6 +199,14 @@
             document.getElementById('delivery-total').innerText = 'Rs. ' + deliveryTotal;
             document.getElementById('cod-total-display').innerText = '+ Rs. ' + codTotalFee;
             togglePaymentUI();
+        }
+
+        function updateQty(index, change) {
+            if(!cart[index].quantity) cart[index].quantity = 1;
+            cart[index].quantity += change;
+            if(cart[index].quantity < 1) cart[index].quantity = 1;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCheckout();
         }
 
         function removeItem(index) {
@@ -249,11 +262,12 @@
 
                 await database.ref('orders').push({
                     customerName: name, customerPhone: phone, customerCity: city, customerAddress: address,
-                    productName: cart.map(i => i.name).join(', '), price: grand, paymentMethod: method, screenshot: ssUrl, date: new Date().toLocaleString()
+                    productName: cart.map(i => `${i.name} (x${i.quantity || 1})`).join(', '), price: grand, paymentMethod: method, screenshot: ssUrl, date: new Date().toLocaleString()
                 });
 
                 let waText = `*🔥 NEW ORDER - WALEED STORE 🔥*%0A%0A`;
                 waText += `👤 *Name:* ${name}%0A📞 *Phone:* ${phone}%0A📍 *City:* ${city}%0A🏠 *Address:* ${address}%0A%0A`;
+                waText += `*--- ITEMS ---*%0A${cart.map(i => `📦 ${i.name} x ${i.quantity || 1}`).join('%0A')}%0A%0A`;
                 waText += `*--- BILLING ---*%0A💰 *Subtotal:* ${sub}%0A🚚 *Delivery:* ${del}%0A💳 *COD Fee:* ${codF}%0A✅ *Total:* ${grand}%0A%0A`;
                 waText += `💳 *Method:* ${method.toUpperCase()}%0A🖼️ *Screenshot:* ${ssUrl}`;
 
@@ -264,5 +278,4 @@
         loadCheckout();
     </script>
 </body>
-    </html>
-    
+</html>
