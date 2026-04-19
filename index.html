@@ -58,10 +58,10 @@
         
         .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
 
-        /* Custom Logo Styling */
-        .logo-container { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
-        .logo-icon { width: 26px; height: 26px; margin-bottom: 2px; }
-        .logo-text { display: flex; align-items: center; font-size: 13px; font-weight: 800; letter-spacing: -0.3px; margin-top: 1px; }
+        /* CUSTOM LOGO AREA (MegaBazar Sample Style) */
+        .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
+        .brand-icon { width: 32px; height: 32px; margin-bottom: -2px; }
+        .brand-name { font-size: 14px; font-weight: 800; display: flex; align-items: center; }
     </style>
 </head>
 <body class="bg-white">
@@ -98,7 +98,7 @@
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <nav class="glass fixed w-full top-0 z-50 px-4 py-1 border-b border-slate-100">
+    <nav class="glass fixed w-full top-0 z-50 px-4 py-1.5 border-b border-slate-100">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleMenu()" class="p-2">
@@ -106,13 +106,13 @@
                 </button>
             </div>
             <div class="flex justify-center">
-                <a href="#" class="logo-container">
-                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M3 6H21" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <a href="#" class="brand-logo">
+                    <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 20C9 21.1046 8.10457 22 7 22C5.89543 22 5 21.1046 5 20C5 18.8954 5.89543 18 7 18C8.10457 18 9 18.8954 9 20Z" fill="#1e293b"/>
+                        <path d="M20 20C20 21.1046 19.1046 22 18 22C16.8954 22 16 21.1046 16 20C16 18.8954 16.8954 18 18 18C19.1046 18 20 18.8954 20 20Z" fill="#1e293b"/>
+                        <path d="M1 1H5L6.68 14.39C6.74149 14.8973 6.98351 15.362 7.36214 15.7004C7.74077 16.0388 8.2309 16.2285 8.74 16.23H17.72C18.2291 16.2285 18.7192 16.0388 19.0979 15.7004C19.4765 15.362 19.7185 14.8973 19.78 14.39L21 4H5.21" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <div class="logo-text">
+                    <div class="brand-name">
                         <span class="text-slate-900">Waleed</span>
                         <span class="text-blue-600 ml-1">Store</span>
                     </div>
@@ -127,7 +127,7 @@
         </div>
     </nav>
 
-    <header id="top" class="hero-bg pt-24 pb-16 text-white text-center px-4">
+    <header id="top" class="hero-bg pt-28 pb-16 text-white text-center px-4">
         <div data-aos="fade-down" class="mb-6">
             <h1 class="text-3xl font-extrabold mb-2"><span class="premium-text">Premium Quality</span></h1>
             <p class="text-slate-300 text-xs opacity-80">Your trust is our priority. Order now.</p>
@@ -365,4 +365,4 @@
         function sendOrder() {
             const name = document.getElementById('userName').value;
             const msg = document.getElementById('userMsg').value;
-            if(!name || !msg) 
+            if(!name || !msg) { alert("Please enter name and message"); retu
