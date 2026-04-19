@@ -20,14 +20,23 @@
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
-        /* PREMIUM SLIDER WITH DOTS & SPRING EFFECT */
-        .slider-container { width: 100%; overflow: hidden; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #000; }
-        .slider-wrapper { display: flex; transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); height: 100%; }
-        .slider-img { min-width: 100%; width: 100%; height: 100%; object-fit: cover; }
+        /* PREMIUM FADE SLIDER */
+        .slider-container { width: 100%; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #020617; overflow: hidden; cursor: pointer; }
+        .slider-wrapper { position: relative; width: 100%; height: 100%; }
+        .slider-img { 
+            position: absolute; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            object-fit: cover; 
+            opacity: 0; 
+            transition: opacity 0.8s ease-in-out; 
+            z-index: 1;
+        }
+        .slider-img.active { opacity: 1; z-index: 10; }
 
         .dots-container { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
-        .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: pointer; }
+        .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; }
 
         .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .badge-box i { font-size: 1.3rem; margin-bottom: 4px; color: #2563eb; } 
@@ -66,7 +75,7 @@
         </div>
         
         <div class="max-w-sm mx-auto" data-aos="zoom-in">
-            <div class="slider-container">
+            <div class="slider-container" onclick="nextSlide()">
                 <div id="sliderWrapper" class="slider-wrapper"></div>
             </div>
             <div id="dotsWrapper" class="dots-container"></div>
@@ -111,7 +120,7 @@
                 <div>
                     <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-2"></i>
                     <h4 class="text-xs font-bold text-blue-400 uppercase">Location</h4>
-                    <p class="text-sm opacity-80">Punjab, Pakistan</p>
+                    <p class="text-sm opacity-80">Faisalabad, Pakistan</p>
                 </div>
                 <div>
                     <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-2"></i>
@@ -152,38 +161,62 @@
                 dotsWrapper.innerHTML = "";
                 let index = 0;
                 snapshot.forEach(child => {
-                    wrapper.innerHTML += `<img src="${child.val().url}" class="slider-img">`;
-                    dotsWrapper.innerHTML += `<div class="dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></div>`;
+                    const img = document.createElement('img');
+                    img.src = child.val().url;
+                    img.className = `slider-img ${index === 0 ? 'active' : ''}`;
+                    wrapper.appendChild(img);
+                    
+                    const dot = document.createElement('div');
+                    dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                    dot.onclick = (e) => { e.stopPropagation(); goToSlide(index); };
+                    dotsWrapper.appendChild(dot);
                     index++;
                 });
                 imagesCount = index;
                 startAutoSlide();
+                setupSwipe();
             }
         });
 
         function updateSlider() {
-            const wrapper = document.getElementById('sliderWrapper');
+            const imgs = document.querySelectorAll('.slider-img');
             const dots = document.querySelectorAll('.dot');
-            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentSlide);
-            });
+            imgs.forEach((img, i) => img.classList.toggle('active', i === currentSlide));
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % imagesCount;
+            updateSlider();
+            startAutoSlide();
         }
 
         function goToSlide(index) {
             currentSlide = index;
             updateSlider();
-            startAutoSlide(); // Reset timer on manual click
+            startAutoSlide();
         }
 
         function startAutoSlide() {
             clearInterval(autoSlideTimer);
             if(imagesCount > 1) {
-                autoSlideTimer = setInterval(() => {
-                    currentSlide = (currentSlide + 1) % imagesCount;
-                    updateSlider();
-                }, 4000);
+                autoSlideTimer = setInterval(nextSlide, 4500);
             }
+        }
+
+        function setupSwipe() {
+            let touchstartX = 0;
+            const slider = document.querySelector('.slider-container');
+            slider.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+            slider.addEventListener('touchend', e => {
+                let touchendX = e.changedTouches[0].screenX;
+                if (touchstartX - touchendX > 50) nextSlide();
+                if (touchendX - touchstartX > 50) {
+                    currentSlide = (currentSlide - 1 + imagesCount) % imagesCount;
+                    updateSlider();
+                    startAutoSlide();
+                }
+            }, {passive: true});
         }
 
         function addToCart(id, name, price, img) {
@@ -199,7 +232,6 @@
             if(countEl) countEl.innerText = cart.length;
         }
 
-        window.addEventListener('pageshow', updateCartCount);
         updateCartCount();
 
         database.ref('products').on('value', (snapshot) => {
@@ -208,10 +240,7 @@
             snapshot.forEach((child) => {
                 const p = child.val();
                 const id = child.key;
-                const imagesArray = p.images || [p.image];
-                const firstImage = imagesArray[0] || 'https://placehold.co/400x400';
-                const displayOldPrice = p.originalPrice || p.price;
-
+                const firstImage = (p.images ? p.images[0] : p.image) || 'https://placehold.co/400x400';
                 grid.innerHTML += `
                     <div class="product-card p-2" data-aos="fade-up">
                         <div class="rounded-xl overflow-hidden aspect-square mb-2 relative bg-slate-50" onclick="window.location.href='product.html?id=${id}'">
@@ -220,7 +249,7 @@
                         <div class="px-1 flex flex-col justify-between flex-grow">
                             <h3 class="font-bold text-[11px] text-slate-800 truncate">${p.name}</h3>
                             <div class="mt-1">
-                                <span class="text-[10px] text-slate-400 line-through">Rs. ${displayOldPrice}</span>
+                                <span class="text-[10px] text-slate-400 line-through">Rs. ${p.originalPrice || p.price}</span>
                                 <div class="text-sm font-extrabold text-blue-600">Rs. ${p.price}</div>
                             </div>
                             <button onclick="addToCart('${id}', '${p.name}', '${p.price}', '${firstImage}')" class="add-to-cart-btn active:scale-95 transition">Add To Cart</button>
