@@ -16,11 +16,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
         html, body { max-width: 100%; overflow-x: hidden; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
         .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
+        /* Theme Deep Blue Color */
         .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
+        .text-theme-blue { color: #1e3a8a; }
+        .bg-theme-blue { background-color: #1e3a8a; }
+
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
-        /* SIDE CART & MENU DRAWER */
         #side-cart, #side-menu { position: fixed; top: 0; height: 100%; background: white; z-index: 1000; transition: 0.4s ease-in-out; box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         #side-cart { right: -100%; width: 85%; max-width: 400px; }
         #side-cart.active { right: 0; }
@@ -31,28 +34,19 @@
         .overlay.active { display: block; }
 
         .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; color: #1e293b; }
-        .nav-btn:active { background: #f8fafc; color: #2563eb; }
+        .nav-btn:active { background: #f8fafc; color: #1e3a8a; }
 
-        /* PREMIUM FADE SLIDER */
         .slider-container { width: 100%; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #020617; overflow: hidden; cursor: pointer; }
         .slider-wrapper { position: relative; width: 100%; height: 100%; }
-        .slider-img { 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            object-fit: cover; 
-            opacity: 0; 
-            transition: opacity 0.8s ease-in-out; 
-            z-index: 1;
-        }
+        .slider-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; z-index: 1; }
         .slider-img.active { opacity: 1; z-index: 10; }
 
         .dots-container { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: default; }
-        .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; }
+        .dot.active { background: #1e3a8a; width: 24px; border-radius: 10px; }
 
         .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .badge-box i { font-size: 1.3rem; margin-bottom: 4px; color: #2563eb; } 
+        .badge-box i { font-size: 1.3rem; margin-bottom: 4px; color: #1e3a8a; } 
         .badge-box h4 { font-size: 9px; font-weight: 800; color: #0f172a; margin-bottom: 1px; text-transform: uppercase; }
         .badge-box span { font-size: 7px; font-weight: 700; color: #64748b; text-transform: uppercase; }
 
@@ -67,13 +61,13 @@
     <div class="overlay" id="main-overlay" onclick="closeAllDrawers()"></div>
 
     <div id="side-menu">
-        <div class="p-6 border-b flex justify-between items-center bg-blue-600 text-white">
+        <div class="p-6 border-b flex justify-between items-center bg-theme-blue text-white">
             <h2 class="font-bold text-lg tracking-tight">Menu</h2>
             <button onclick="closeAllDrawers()"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
         <div class="flex flex-col p-2">
-            <button onclick="scrollToSection('top')" class="nav-btn"><i class="fa-solid fa-house mr-3 text-blue-600"></i> Home</button>
-            <button onclick="scrollToSection('contact')" class="nav-btn"><i class="fa-solid fa-envelope mr-3 text-blue-600"></i> Contact Us</button>
+            <button onclick="scrollToSection('top')" class="nav-btn"><i class="fa-solid fa-house mr-3 text-theme-blue"></i> Home</button>
+            <button onclick="scrollToSection('contact')" class="nav-btn"><i class="fa-solid fa-envelope mr-3 text-theme-blue"></i> Contact Us</button>
         </div>
     </div>
 
@@ -86,7 +80,7 @@
         <div class="p-4 border-t bg-slate-50">
             <div class="flex justify-between items-center mb-4">
                 <span class="text-slate-500 font-semibold">Total:</span>
-                <span id="cart-total" class="font-bold text-blue-600">Rs. 0</span>
+                <span id="cart-total" class="font-bold text-theme-blue">Rs. 0</span>
             </div>
             <button onclick="window.location.href='checkout.html'" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest active:scale-95 transition">Check Out</button>
         </div>
@@ -100,21 +94,21 @@
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleMenu()" class="p-2">
-                    <i class="fa-solid fa-bars-staggered text-xl text-blue-600"></i>
+                    <i class="fa-solid fa-bars-staggered text-xl text-theme-blue"></i>
                 </button>
             </div>
 
             <div class="flex justify-center">
                 <a href="#" class="flex items-center space-x-1">
                     <span class="text-xl font-extrabold text-slate-900">Waleed</span>
-                    <span class="text-xl font-extrabold text-blue-600">Store</span>
+                    <span class="text-xl font-extrabold text-theme-blue">Store</span>
                 </a>
             </div>
 
             <div class="flex justify-end">
                 <div class="relative p-1 cursor-pointer" onclick="toggleCart()">
                     <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-theme-blue text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
                 </div>
             </div>
         </div>
@@ -125,7 +119,6 @@
             <h1 class="text-3xl font-extrabold mb-2"><span class="premium-text">Premium Quality</span></h1>
             <p class="text-slate-300 text-xs opacity-80">Your trust is our priority. Order now.</p>
         </div>
-        
         <div class="max-w-sm mx-auto" data-aos="zoom-in">
             <div class="slider-container" onclick="nextSlide()">
                 <div id="sliderWrapper" class="slider-wrapper"></div>
@@ -155,7 +148,7 @@
     <section id="products" class="py-8 px-4">
         <div class="text-center mb-8">
             <h2 class="text-2xl font-bold text-slate-800">New Products</h2>
-            <div class="h-1 w-10 bg-blue-600 mx-auto mt-2 rounded-full"></div>
+            <div class="h-1 w-10 bg-theme-blue mx-auto mt-2 rounded-full"></div>
         </div>
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
     </section>
@@ -166,7 +159,7 @@
             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-10 text-left">
                 <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none text-white text-sm mb-4">
                 <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
-                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send to WhatsApp</button>
+                <button onclick="sendOrder()" class="w-full bg-theme-blue py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send to WhatsApp</button>
             </div>
             <div class="grid grid-cols-1 gap-8">
                 <div>
@@ -205,7 +198,6 @@
         let imagesCount = 0;
         let autoSlideTimer;
 
-        // NAVIGATION LOGIC
         function toggleMenu() {
             document.getElementById('side-menu').classList.toggle('active');
             document.getElementById('main-overlay').classList.toggle('active');
@@ -319,7 +311,7 @@
                         <img src="${item.img}" class="w-16 h-16 object-cover rounded-lg">
                         <div class="flex-grow">
                             <h4 class="font-bold text-[11px] truncate w-32">${item.name}</h4>
-                            <p class="text-blue-600 font-bold text-xs">Rs. ${item.price}</p>
+                            <p class="text-[#1e3a8a] font-bold text-xs">Rs. ${item.price}</p>
                         </div>
                         <button onclick="removeFromCart(${index})"><i class="fa-solid fa-trash-can text-red-400 text-sm"></i></button>
                     </div>`;
@@ -351,7 +343,7 @@
                             <h3 class="font-bold text-[11px] text-slate-800 truncate">${p.name}</h3>
                             <div class="mt-1">
                                 <span class="text-[10px] text-slate-400 line-through">Rs. ${p.originalPrice || p.price}</span>
-                                <div class="text-sm font-extrabold text-blue-600">Rs. ${p.price}</div>
+                                <div class="text-sm font-extrabold text-[#1e3a8a]">Rs. ${p.price}</div>
                             </div>
                             <button onclick="addToCart('${id}', '${p.name}', '${p.price}', '${firstImage}')" class="add-to-cart-btn active:scale-95 transition">Add To Cart</button>
                         </div>
@@ -369,4 +361,5 @@
         AOS.init({ duration: 1000, once: true });
     </script>
 </body>
-</html>
+    </html>
+    
