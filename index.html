@@ -291,13 +291,13 @@
             }, {passive: true});
         }
 
-        function addToCart(id, name, price, img) {
+        function addToCart(id, name, price, img, originalPrice) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             let existingItem = cart.find(item => item.id === id);
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
-                cart.push({ id, name, price, img, quantity: 1 });
+                cart.push({ id, name, price, img, quantity: 1, originalPrice: originalPrice });
             }
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
@@ -376,7 +376,7 @@
                                 <span class="text-[10px] text-slate-400 line-through">Rs. ${p.originalPrice || p.price}</span>
                                 <div class="text-sm font-extrabold text-blue-600">Rs. ${p.price}</div>
                             </div>
-                            <button onclick="addToCart('${id}', '${p.name}', '${p.price}', '${firstImage}')" class="add-to-cart-btn active:scale-95 transition">Add To Cart</button>
+                            <button onclick="addToCart('${id}', '${p.name}', '${p.price}', '${firstImage}', '${p.originalPrice || p.price}')" class="add-to-cart-btn active:scale-95 transition">Add To Cart</button>
                         </div>
                     </div>`;
             });
