@@ -20,7 +20,6 @@
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
-        /* SIDE CART & MENU DRAWER */
         #side-cart, #side-menu { position: fixed; top: 0; height: 100%; background: white; z-index: 1000; transition: 0.4s ease-in-out; box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         #side-cart { right: -100%; width: 85%; max-width: 400px; }
         #side-cart.active { right: 0; }
@@ -30,12 +29,10 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
         .overlay.active { display: block; }
 
-        /* Icon colors in Menu */
         .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; color: #1e293b; }
-        .nav-btn i { color: #2563eb !important; } /* Blue Icons */
+        .nav-btn i { color: #2563eb !important; }
         .nav-btn:active { background: #f8fafc; color: #2563eb; }
 
-        /* PREMIUM FADE SLIDER */
         .slider-container { width: 100%; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #020617; overflow: hidden; cursor: pointer; }
         .slider-wrapper { position: relative; width: 100%; height: 100%; }
         .slider-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; z-index: 1; }
@@ -45,10 +42,7 @@
         .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: default; }
         .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; }
 
-        /* Badge Box Fixes */
         .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        /* MARKED LINE REMOVED BELOW */
-        .badge-box.delivery-active { border-right: 1px solid #e2e8f0; } 
         .badge-box i { font-size: 1.3rem; margin-bottom: 4px; color: #2563eb; } 
         .badge-box h4 { font-size: 9px; font-weight: 800; color: #0f172a; margin-bottom: 1px; text-transform: uppercase; }
         .badge-box span { font-size: 7px; font-weight: 700; color: #64748b; text-transform: uppercase; }
@@ -58,10 +52,10 @@
         
         .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
 
-        /* CUSTOM LOGO AREA (MegaBazar Sample Style) */
+        /* EXACT LOGO STYLE */
         .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
-        .brand-icon { width: 32px; height: 32px; margin-bottom: -2px; }
-        .brand-name { font-size: 14px; font-weight: 800; display: flex; align-items: center; }
+        .brand-icon { width: 28px; height: 28px; margin-bottom: 1px; }
+        .brand-name { font-size: 13px; font-weight: 900; line-height: 1; display: flex; align-items: center; letter-spacing: -0.5px; }
     </style>
 </head>
 <body class="bg-white">
@@ -98,7 +92,7 @@
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <nav class="glass fixed w-full top-0 z-50 px-4 py-1.5 border-b border-slate-100">
+    <nav class="glass fixed w-full top-0 z-50 px-4 py-1 border-b border-slate-100">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleMenu()" class="p-2">
@@ -108,13 +102,13 @@
             <div class="flex justify-center">
                 <a href="#" class="brand-logo">
                     <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 20C9 21.1046 8.10457 22 7 22C5.89543 22 5 21.1046 5 20C5 18.8954 5.89543 18 7 18C8.10457 18 9 18.8954 9 20Z" fill="#1e293b"/>
-                        <path d="M20 20C20 21.1046 19.1046 22 18 22C16.8954 22 16 21.1046 16 20C16 18.8954 16.8954 18 18 18C19.1046 18 20 18.8954 20 20Z" fill="#1e293b"/>
-                        <path d="M1 1H5L6.68 14.39C6.74149 14.8973 6.98351 15.362 7.36214 15.7004C7.74077 16.0388 8.2309 16.2285 8.74 16.23H17.72C18.2291 16.2285 18.7192 16.0388 19.0979 15.7004C19.4765 15.362 19.7185 14.8973 19.78 14.39L21 4H5.21" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="9" cy="20" r="2" fill="#1e293b"/>
+                        <circle cx="18" cy="20" r="2" fill="#1e293b"/>
                     </svg>
                     <div class="brand-name">
-                        <span class="text-slate-900">Waleed</span>
-                        <span class="text-blue-600 ml-1">Store</span>
+                        <span class="text-slate-900 uppercase">Waleed</span>
+                        <span class="text-blue-600 ml-1 uppercase">Store</span>
                     </div>
                 </a>
             </div>
