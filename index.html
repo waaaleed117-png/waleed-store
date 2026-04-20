@@ -348,10 +348,18 @@
         }
 
         function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartData = localStorage.getItem('cart');
+            let cart = [];
+            try {
+                cart = cartData ? JSON.parse(cartData) : [];
+                if (!Array.isArray(cart)) cart = [];
+            } catch (e) {
+                cart = [];
+            }
+            
             const countEl = document.getElementById('cart-count');
             if(countEl) {
-                let totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+                let totalItems = cart.reduce((acc, item) => acc + (parseInt(item.quantity) || 0), 0);
                 countEl.innerText = totalItems;
             }
         }
