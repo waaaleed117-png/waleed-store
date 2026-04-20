@@ -12,12 +12,11 @@
     <style>
         .payment-card { transition: 0.3s; border: 2px solid #f1f5f9; cursor: pointer; }
         .payment-radio:checked + .payment-card { border-color: #2563eb; background: #eff6ff; }
+        .payment-radio:checked + .payment-card .fa-circle-check { color: #2563eb; }
         .upload-dashed { border: 2px dashed #cbd5e1; transition: 0.3s; }
         .upload-dashed:hover { border-color: #2563eb; background: #f8fafc; }
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* Main web jaisa style buttons ke liye */
         .qty-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 8px; font-weight: bold; font-size: 16px; transition: 0.2s; }
         .qty-btn:active { background: #e2e8f0; transform: scale(0.9); }
     </style>
@@ -30,7 +29,7 @@
     </nav>
 
     <div class="p-4 space-y-6 max-w-lg mx-auto">
-        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+        <div id="billing-summary" class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
             <h2 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-bag-shopping text-blue-600"></i> Your Items
             </h2>
@@ -60,10 +59,15 @@
             <h2 class="font-bold text-slate-800 flex items-center gap-2">
                 <i class="fa-solid fa-location-dot text-blue-600"></i> Shipping Details
             </h2>
-            <input type="text" id="custName" placeholder="Full Name" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
-            <input type="number" id="custPhone" placeholder="WhatsApp Number" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
-            <input type="text" id="custCity" placeholder="City Name" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
-            <textarea id="custAddress" placeholder="Complete Address" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500 h-24"></textarea>
+            <div class="grid grid-cols-2 gap-3">
+                <input type="text" id="firstName" placeholder="First name" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
+                <input type="text" id="lastName" placeholder="Last name" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
+            </div>
+            <input type="text" id="custAddress" placeholder="Address" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
+            <input type="text" id="custApartment" placeholder="Apartment, suite, etc. (optional)" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
+            <input type="text" id="custCity" placeholder="City" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
+            <input type="number" id="custPhone" placeholder="Phone" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
+            <input type="number" id="custWhatsapp" placeholder="WhatsApp Number" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500">
         </div>
 
         <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-4">
@@ -72,7 +76,7 @@
             </h2>
             
             <div class="grid grid-cols-1 gap-3">
-                <label class="relative">
+                <label class="relative cursor-pointer">
                     <input type="radio" name="payMethod" value="advance" class="payment-radio hidden" checked onchange="togglePaymentUI()">
                     <div class="payment-card p-4 rounded-2xl flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -82,11 +86,11 @@
                                 <p class="text-[10px] text-green-600 font-bold">Fast Delivery & No Extra Fees</p>
                             </div>
                         </div>
-                        <i class="fa-solid fa-circle-check text-blue-600"></i>
+                        <i class="fa-solid fa-circle-check text-slate-200"></i>
                     </div>
                 </label>
 
-                <label class="relative">
+                <label class="relative cursor-pointer">
                     <input type="radio" name="payMethod" value="cod" class="payment-radio hidden" onchange="togglePaymentUI()">
                     <div class="payment-card p-4 rounded-2xl flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -162,20 +166,25 @@
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let baseTotal = 0;
-        let codTotalFee = 0;
+        let finalCodFee = 0; 
         const imgbbKey = "2d7d1d644318674d9d8dcd961cb666ae";
 
         function loadCheckout() {
             const container = document.getElementById('checkout-items');
-            let subtotal = 0; let deliveryTotal = 0; codTotalFee = 0;
+            let subtotal = 0; let deliveryTotal = 0; finalCodFee = 0;
             container.innerHTML = '';
             
+            if(cart.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-400 py-4">Your cart is empty</p>';
+            }
+
             cart.forEach((item, index) => {
                 const priceNum = parseInt(item.price.toString().replace(/[^\d]/g, '')) || 0;
                 const qty = item.quantity || 1;
                 subtotal += (priceNum * qty);
                 deliveryTotal += (parseInt(item.deliveryCharges) || 0);
-                codTotalFee += (parseInt(item.codFee) || 0);
+                // Admin panel wali COD fee yahan calculate hogi
+                finalCodFee += (parseInt(item.codFee) || 0);
                 
                 const originalPriceTag = item.originalPrice ? `<span class="text-[10px] text-slate-400 line-through block">Rs. ${item.originalPrice}</span>` : '';
 
@@ -188,7 +197,6 @@
                             ${originalPriceTag}
                             <div class="text-blue-600 font-extrabold text-[13px]">${item.price}</div>
                         </div>
-                        
                         <div class="flex items-center gap-3 mt-2">
                             <button onclick="updateQty(${index}, -1)" class="qty-btn text-slate-600">-</button>
                             <span class="text-sm font-bold text-slate-800">${qty}</span>
@@ -202,13 +210,12 @@
             baseTotal = subtotal + deliveryTotal;
             document.getElementById('subtotal').innerText = 'Rs. ' + subtotal;
             document.getElementById('delivery-total').innerText = 'Rs. ' + deliveryTotal;
-            document.getElementById('cod-total-display').innerText = '+ Rs. ' + codTotalFee;
+            document.getElementById('cod-total-display').innerText = '+ Rs. ' + finalCodFee;
             togglePaymentUI();
         }
 
         function updateQty(index, change) {
-            if(!cart[index].quantity) cart[index].quantity = 1;
-            cart[index].quantity += change;
+            cart[index].quantity = (cart[index].quantity || 1) + change;
             if(cart[index].quantity < 1) cart[index].quantity = 1;
             localStorage.setItem('cart', JSON.stringify(cart));
             loadCheckout();
@@ -225,29 +232,46 @@
             const advanceBox = document.getElementById('advance-details');
             const codRow = document.getElementById('cod-row');
             const grandTotalDisplay = document.getElementById('grand-total');
-            if(method === 'cod') { advanceBox.classList.add('hidden'); codRow.classList.remove('hidden'); grandTotalDisplay.innerText = 'Rs. ' + (baseTotal + codTotalFee); }
-            else { advanceBox.classList.remove('hidden'); codRow.classList.add('hidden'); grandTotalDisplay.innerText = 'Rs. ' + baseTotal; }
+
+            if(method === 'cod') { 
+                advanceBox.classList.add('hidden'); 
+                codRow.classList.remove('hidden'); 
+                grandTotalDisplay.innerText = 'Rs. ' + (baseTotal + finalCodFee);
+                document.getElementById('billing-summary').scrollIntoView({ behavior: 'smooth' });
+            }
+            else { 
+                advanceBox.classList.remove('hidden'); 
+                codRow.classList.add('hidden'); 
+                grandTotalDisplay.innerText = 'Rs. ' + baseTotal; 
+            }
         }
 
         function previewSS() {
             const file = document.getElementById('ssUpload').files[0];
             if(file) {
                 const reader = new FileReader();
-                reader.onload = (e) => { document.getElementById('ssPreview').src = e.target.result; document.getElementById('upload-placeholder').classList.add('hidden'); document.getElementById('preview-area').classList.remove('hidden'); };
+                reader.onload = (e) => { 
+                    document.getElementById('ssPreview').src = e.target.result; 
+                    document.getElementById('upload-placeholder').classList.add('hidden'); 
+                    document.getElementById('preview-area').classList.remove('hidden'); 
+                };
                 reader.readAsDataURL(file);
             }
         }
 
         async function placeOrder() {
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
+            const fName = document.getElementById('firstName').value.trim();
+            const lName = document.getElementById('lastName').value.trim();
             const city = document.getElementById('custCity').value.trim();
             const address = document.getElementById('custAddress').value.trim();
+            const apt = document.getElementById('custApartment').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const whatsapp = document.getElementById('custWhatsapp').value.trim();
             const method = document.querySelector('input[name="payMethod"]:checked').value;
             const ssFile = document.getElementById('ssUpload').files[0];
             const btn = document.getElementById('orderBtn');
 
-            if(!name || !phone || !city || !address) return alert("All fields are required!");
+            if(!fName || !lName || !city || !address || !phone || !whatsapp) return alert("Please fill all required fields!");
             if(method === 'advance' && !ssFile) return alert("Screenshot required for advance payment!");
 
             btn.disabled = true; btn.innerHTML = '<div class="loader"></div> Processing...';
@@ -262,16 +286,16 @@
 
                 const sub = document.getElementById('subtotal').innerText;
                 const del = document.getElementById('delivery-total').innerText;
-                const codF = method === 'cod' ? document.getElementById('cod-total-display').innerText : "Rs. 0";
+                const codF = method === 'cod' ? "Rs. " + finalCodFee : "Rs. 0";
                 const grand = document.getElementById('grand-total').innerText;
 
                 await database.ref('orders').push({
-                    customerName: name, customerPhone: phone, customerCity: city, customerAddress: address,
+                    customerName: `${fName} ${lName}`, customerPhone: phone, whatsapp: whatsapp, customerCity: city, customerAddress: `${address} ${apt}`,
                     productName: cart.map(i => `${i.name} (x${i.quantity || 1})`).join(', '), price: grand, paymentMethod: method, screenshot: ssUrl, date: new Date().toLocaleString()
                 });
 
                 let waText = `*🔥 NEW ORDER - WALEED STORE 🔥*%0A%0A`;
-                waText += `👤 *Name:* ${name}%0A📞 *Phone:* ${phone}%0A📍 *City:* ${city}%0A🏠 *Address:* ${address}%0A%0A`;
+                waText += `👤 *Name:* ${fName} ${lName}%0A📞 *Phone:* ${phone}%0A💬 *WhatsApp:* ${whatsapp}%0A📍 *City:* ${city}%0A🏠 *Address:* ${address} ${apt}%0A%0A`;
                 waText += `*--- ITEMS ---*%0A${cart.map(i => `📦 ${i.name} x ${i.quantity || 1}`).join('%0A')}%0A%0A`;
                 waText += `*--- BILLING ---*%0A💰 *Subtotal:* ${sub}%0A🚚 *Delivery:* ${del}%0A💳 *COD Fee:* ${codF}%0A✅ *Total:* ${grand}%0A%0A`;
                 waText += `💳 *Method:* ${method.toUpperCase()}%0A🖼️ *Screenshot:* ${ssUrl}`;
