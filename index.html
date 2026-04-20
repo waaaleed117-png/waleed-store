@@ -34,8 +34,9 @@
         .chat-bubble-admin { background: #eff6ff; color: #1e3a8a; align-self: flex-start; border-radius: 0 15px 15px 15px; border: 1px solid #dbeafe; }
         .chat-bubble-user { background: #2563eb; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
 
-        /* FIX: Chat Input Alignment */
-        .chat-input-container { padding: 12px; border-top: 1px solid #eee; background: white; display: flex; gap: 8px; align-items: center; width: 100%; }
+        /* FIX 1: Chat Input Alignment */
+        .chat-input-container { padding: 12px; border-top: 1px solid #eee; background: white; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; gap: 8px; align-items: center; width: 100%; overflow: hidden; }
+        #userReplyInput { flex: 1 !important; min-width: 0; }
 
         .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; color: #1e293b; }
         .nav-btn i { color: #2563eb !important; }
@@ -197,10 +198,10 @@
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
     </section>
 
-    <section id="contact" class="py-12 px-6 bg-slate-900 text-white rounded-t-[3rem] mt-4">
+    <section id="contact" class="py-8 px-6 bg-slate-900 text-white rounded-t-[3rem] mt-4">
         <div class="container mx-auto text-center">
             <h2 class="text-2xl font-bold mb-4">Contact us</h2>
-            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8 text-left">
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-6 text-left">
                 <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-3 outline-none text-white text-sm mb-4">
                 <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-3 outline-none h-20 text-white text-sm mb-6 resize-none"></textarea>
                 <button onclick="sendSupportMessage()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send Message</button>
