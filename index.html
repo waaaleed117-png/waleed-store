@@ -35,6 +35,9 @@
         .chat-bubble-admin { background: #eff6ff; color: #1e3a8a; align-self: flex-start; border-radius: 0 15px 15px 15px; border: 1px solid #dbeafe; }
         .chat-bubble-user { background: #2563eb; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
 
+        /* Fix for Chat Input Button */
+        .chat-input-container { padding: 12px; border-top: 1px solid #eee; background: white; display: flex; gap: 8px; align-items: center; }
+
         .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; color: #1e293b; }
         .nav-btn i { color: #2563eb !important; }
         .nav-btn:active { background: #f8fafc; color: #2563eb; }
@@ -82,11 +85,10 @@
                 </div>
                 <button onclick="closeChat()"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-slate-50">
-                </div>
-            <div class="p-3 border-t bg-white flex gap-2">
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-slate-50"></div>
+            <div class="chat-input-container">
                 <input type="text" id="userReplyInput" class="flex-1 bg-slate-100 border-none p-3 rounded-xl outline-none text-xs" placeholder="Write a reply...">
-                <button onclick="sendReplyBack()" class="bg-blue-600 text-white p-3 rounded-xl px-5 active:scale-95 transition">
+                <button onclick="sendReplyBack()" class="bg-blue-600 text-white p-3 rounded-xl min-w-[50px] flex items-center justify-center active:scale-95 transition">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
@@ -195,24 +197,24 @@
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
     </section>
 
-    <section id="contact" class="py-16 px-6 bg-slate-900 text-white rounded-t-[3rem]">
+    <section id="contact" class="py-12 px-6 bg-slate-900 text-white rounded-t-[3rem]">
         <div class="container mx-auto text-center">
-            <h2 class="text-2xl font-bold mb-8">Contact us</h2>
-            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-10 text-left">
-                <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none text-white text-sm mb-4">
-                <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
+            <h2 class="text-2xl font-bold mb-6">Contact us</h2>
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8 text-left">
+                <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-3 outline-none text-white text-sm mb-4">
+                <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-3 outline-none h-20 text-white text-sm mb-6 resize-none"></textarea>
                 <button onclick="sendSupportMessage()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send Message</button>
             </div>
-            <div class="grid grid-cols-1 gap-8">
-                <div>
-                    <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-2"></i>
-                    <h4 class="text-xs font-bold text-blue-400 uppercase">Location</h4>
-                    <p class="text-sm opacity-80">Faisalabad, Pakistan</p>
+            <div class="grid grid-cols-1 gap-6">
+                <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-1"></i>
+                    <h4 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Location</h4>
+                    <p class="text-xs opacity-80">Faisalabad, Pakistan</p>
                 </div>
-                <div>
-                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-2"></i>
-                    <h4 class="text-xs font-bold text-green-400 uppercase">WhatsApp</h4>
-                    <p class="text-sm opacity-80">+92 370 4884772</p>
+                <div class="flex flex-col items-center">
+                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-1"></i>
+                    <h4 class="text-[10px] font-bold text-green-400 uppercase tracking-wider">WhatsApp</h4>
+                    <p class="text-xs opacity-80">+92 370 4884772</p>
                 </div>
             </div>
         </div>
@@ -236,14 +238,12 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // UNIQUE USER ID LOGIC
         let userUUID = localStorage.getItem('user_chat_id');
         if (!userUUID) {
             userUUID = 'USER-' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('user_chat_id', userUUID);
         }
 
-        // LISTEN FOR ADMIN REPLIES
         database.ref(`user_chats/${userUUID}`).on('value', (snapshot) => {
             const data = snapshot.val();
             const bell = document.getElementById('bell-container');
@@ -256,10 +256,8 @@
 
         async function openChat() {
             document.getElementById('chat-modal').classList.add('active');
-            // Mark as read when user opens it
             database.ref(`user_chats/${userUUID}`).update({ user_unread: false });
             
-            // Load messages
             database.ref(`chat_history/${userUUID}`).on('value', (snapshot) => {
                 const container = document.getElementById('chat-messages');
                 container.innerHTML = "";
@@ -284,43 +282,22 @@
             if(!name || !msg) return alert("Fill all fields");
 
             const msgObj = { role: 'user', text: msg, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
-            
             await database.ref(`chat_history/${userUUID}`).push(msgObj);
-            await database.ref(`user_chats/${userUUID}`).update({
-                senderName: name,
-                last_message: msg,
-                admin_unread: true,
-                last_update: Date.now()
-            });
-
-            alert("Message sent! Watch for the bell icon for our reply.");
+            await database.ref(`user_chats/${userUUID}`).update({ senderName: name, last_message: msg, admin_unread: true, last_update: Date.now() });
+            alert("Message sent!");
             document.getElementById('userMsg').value = "";
         }
 
         async function sendReplyBack() {
             const input = document.getElementById('userReplyInput');
             if(!input.value) return;
-
-            const msgObj = { 
-                role: 'user', 
-                text: input.value, 
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
-            };
-
+            const msgObj = { role: 'user', text: input.value, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
             await database.ref(`chat_history/${userUUID}`).push(msgObj);
-            await database.ref(`user_chats/${userUUID}`).update({
-                last_message: input.value,
-                admin_unread: true,
-                last_update: Date.now()
-            });
-
+            await database.ref(`user_chats/${userUUID}`).update({ last_message: input.value, admin_unread: true, last_update: Date.now() });
             input.value = "";
         }
 
-        // --- EXISTING STORE FUNCTIONS ---
-        let currentSlide = 0;
-        let imagesCount = 0;
-        let autoSlideTimer;
+        let currentSlide = 0, imagesCount = 0, autoSlideTimer;
 
         function toggleMenu() {
             document.getElementById('side-menu').classList.toggle('active');
@@ -348,8 +325,7 @@
             const wrapper = document.getElementById('sliderWrapper');
             const dotsWrapper = document.getElementById('dotsWrapper');
             if(snapshot.exists()){
-                wrapper.innerHTML = "";
-                dotsWrapper.innerHTML = "";
+                wrapper.innerHTML = ""; dotsWrapper.innerHTML = "";
                 let index = 0;
                 snapshot.forEach(child => {
                     const img = document.createElement('img');
@@ -361,31 +337,18 @@
                     dotsWrapper.appendChild(dot);
                     index++;
                 });
-                imagesCount = index;
-                startAutoSlide();
-                setupSwipe();
+                imagesCount = index; startAutoSlide(); setupSwipe();
             }
         });
 
         function updateSlider() {
-            const imgs = document.querySelectorAll('.slider-img');
-            const dots = document.querySelectorAll('.dot');
+            const imgs = document.querySelectorAll('.slider-img'), dots = document.querySelectorAll('.dot');
             imgs.forEach((img, i) => img.classList.toggle('active', i === currentSlide));
             dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
         }
 
-        function nextSlide() {
-            if(imagesCount > 0) {
-                currentSlide = (currentSlide + 1) % imagesCount;
-                updateSlider();
-                startAutoSlide();
-            }
-        }
-
-        function startAutoSlide() {
-            clearInterval(autoSlideTimer);
-            if(imagesCount > 1) autoSlideTimer = setInterval(nextSlide, 4500);
-        }
+        function nextSlide() { if(imagesCount > 0) { currentSlide = (currentSlide + 1) % imagesCount; updateSlider(); startAutoSlide(); } }
+        function startAutoSlide() { clearInterval(autoSlideTimer); if(imagesCount > 1) autoSlideTimer = setInterval(nextSlide, 4500); }
 
         function setupSwipe() {
             let touchstartX = 0;
@@ -394,10 +357,7 @@
             slider.addEventListener('touchend', e => {
                 let touchendX = e.changedTouches[0].screenX;
                 if (touchstartX - touchendX > 50) nextSlide();
-                if (touchendX - touchstartX > 50) {
-                    currentSlide = (currentSlide - 1 + imagesCount) % imagesCount;
-                    updateSlider(); startAutoSlide();
-                }
+                if (touchendX - touchstartX > 50) { currentSlide = (currentSlide - 1 + imagesCount) % imagesCount; updateSlider(); startAutoSlide(); }
             }, {passive: true});
         }
 
@@ -427,8 +387,7 @@
 
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const container = document.getElementById('cart-items');
-            const totalEl = document.getElementById('cart-total');
+            const container = document.getElementById('cart-items'), totalEl = document.getElementById('cart-total');
             container.innerHTML = cart.length === 0 ? '<p class="text-center text-slate-400 mt-10">Cart is empty</p>' : '';
             let total = 0;
             cart.forEach((item, index) => {
@@ -465,8 +424,7 @@
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
             snapshot.forEach((child) => {
-                const p = child.val();
-                const id = child.key;
+                const p = child.val(), id = child.key;
                 const firstImage = (p.images ? p.images[0] : p.image) || 'https://placehold.co/400x400';
                 grid.innerHTML += `
                     <div class="product-card p-2" data-aos="fade-up">
