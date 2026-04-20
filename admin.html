@@ -24,6 +24,9 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden-section { display: none; }
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-left: 4px; display: block; margin-bottom: 5px; }
+        /* Chat UI Styles */
+        .chat-bubble-admin { background: #3b82f6; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
+        .chat-bubble-user { background: #1e293b; color: #e2e8f0; align-self: flex-start; border-radius: 15px 15px 15px 0; border: 1px solid #334155; }
     </style>
 </head>
 <body>
@@ -46,6 +49,10 @@
             <button onclick="showSection('view-orders')" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
                 <i class="fa-solid fa-cart-shopping"></i> View Orders
             </button>
+            <button onclick="showSection('user-messages')" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3 relative">
+                <i class="fa-solid fa-comment-dots"></i> User Messages
+                <span id="msg-notif-dot" class="hidden absolute right-4 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
         </nav>
     </div>
 
@@ -63,23 +70,22 @@
                     <p class="text-sm text-slate-400" id="sliderUploadStatus">Click to upload banner (Professional Look)</p>
                     <input type="file" id="sliderFileInput" class="hidden" onchange="uploadSliderImage()">
                 </div>
-                <div id="slider-images-list" class="grid grid-cols-1 gap-4">
-                    </div>
+                <div id="slider-images-list" class="grid grid-cols-1 gap-4"></div>
             </div>
         </div>
 
         <div id="add-product" class="glass-card p-6 max-w-2xl mx-auto shadow-2xl cursor-default hover:transform-none">
             <div class="mb-4"><label>Product Name</label><input type="text" id="pName" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="Enter name"></div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div><label>Original Price (With Line)</label><input type="number" id="pOldPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 5000"></div>
-                <div><label>Sale Price (Actual)</label><input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 3500"></div>
+                <div><label>Original Price</label><input type="number" id="pOldPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 5000"></div>
+                <div><label>Sale Price</label><input type="number" id="pPrice" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="e.g. 3500"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div><label>Delivery Charges</label><input type="number" id="pDelivery" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="200"></div>
                 <div><label>COD Fee</label><input type="number" id="pCod" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" value="0"></div>
             </div>
             <div class="mb-4"><label>Description</label><textarea id="pDesc" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl h-24 outline-none" placeholder="Product description..."></textarea></div>
-            <div class="mb-6"><label>YouTube Video Link</label><input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="https://youtube.com/..."></div>
+            <div class="mb-6"><label>YouTube Video Link</label><input type="text" id="pVideo" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl outline-none" placeholder="YouTube URL..."></div>
             
             <label>Upload Images (Max 4)</label>
             <div class="grid grid-cols-2 gap-3 mb-8">
@@ -93,6 +99,35 @@
 
         <div id="manage-products" class="hidden-section"><div id="admin-product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
         <div id="view-orders" class="hidden-section"><div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+
+        <div id="user-messages" class="hidden-section">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[70vh]">
+                <div class="glass-card p-4 overflow-y-auto space-y-3 border border-slate-800">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase px-2 mb-4">Active Conversations</h3>
+                    <div id="chat-users-list" class="space-y-2">
+                        </div>
+                </div>
+                <div id="chat-window" class="md:col-span-2 glass-card flex flex-col overflow-hidden hidden">
+                    <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/30">
+                        <div>
+                            <h3 id="current-chat-user" class="font-bold text-blue-400">Select a user</h3>
+                            <p class="text-[10px] text-slate-400">Real-time Support</p>
+                        </div>
+                        <button onclick="closeChat()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+                        </div>
+                    <div class="p-4 bg-slate-800/50 border-t border-slate-800 flex gap-2">
+                        <input type="text" id="adminReplyInput" class="flex-1 bg-slate-900 border border-slate-700 p-3 rounded-xl outline-none text-sm" placeholder="Type your reply...">
+                        <button onclick="sendReply()" class="bg-blue-600 p-3 rounded-xl px-6 font-bold hover:bg-blue-500 transition"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+                <div id="chat-placeholder" class="md:col-span-2 glass-card flex flex-col items-center justify-center text-slate-600 border-2 border-dashed border-slate-800">
+                    <i class="fa-solid fa-comments text-5xl mb-4"></i>
+                    <p>Select a user to start replying</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="orderModal" class="modal">
@@ -117,17 +152,109 @@
         const database = firebase.database();
         const imgbbKey = "2d7d1d644318674d9d8dcd961cb666ae";
 
+        // Global state for chat
+        let activeChatUserID = null;
+
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
         function closeModal() { document.getElementById('orderModal').classList.remove('active'); }
 
         function showSection(id) {
             document.querySelectorAll('.main-content > div:not(.flex)').forEach(div => div.classList.add('hidden-section'));
             document.getElementById(id).classList.remove('hidden-section');
-            const titles = {'add-product': 'Add Product', 'view-orders': 'Customer Orders', 'manage-products': 'Manage Store', 'manage-slider': 'Manage Slider'};
+            const titles = {'add-product': 'Add Product', 'view-orders': 'Customer Orders', 'manage-products': 'Manage Store', 'manage-slider': 'Manage Slider', 'user-messages': 'Support Inbox'};
             document.getElementById('page-title').innerText = titles[id];
             if(window.innerWidth < 768) toggleSidebar();
         }
 
+        // --- NEW: Chat Management Functions ---
+
+        // Listen for all messages sent by users
+        database.ref('user_chats').on('value', (snapshot) => {
+            const list = document.getElementById('chat-users-list');
+            const notifDot = document.getElementById('msg-notif-dot');
+            list.innerHTML = "";
+            let hasNew = false;
+
+            snapshot.forEach(child => {
+                const chatData = child.val();
+                const userId = child.key;
+                const lastMsg = chatData.last_message || "New Conversation";
+                const isUnread = chatData.admin_unread === true;
+                if(isUnread) hasNew = true;
+
+                list.innerHTML += `
+                    <div onclick="openChat('${userId}', '${chatData.senderName}')" class="p-3 rounded-xl transition cursor-pointer flex justify-between items-center ${activeChatUserID === userId ? 'bg-blue-600/20 border border-blue-500/30' : 'hover:bg-slate-800/50 border border-transparent'}">
+                        <div>
+                            <h4 class="text-sm font-bold ${isUnread ? 'text-white' : 'text-slate-400'}">${chatData.senderName || 'Anonymous'}</h4>
+                            <p class="text-[10px] text-slate-500 truncate w-32">${lastMsg}</p>
+                        </div>
+                        ${isUnread ? '<span class="w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
+                    </div>
+                `;
+            });
+            notifDot.classList.toggle('hidden', !hasNew);
+        });
+
+        function openChat(userId, name) {
+            activeChatUserID = userId;
+            document.getElementById('chat-window').classList.remove('hidden');
+            document.getElementById('chat-placeholder').classList.add('hidden');
+            document.getElementById('current-chat-user').innerText = name;
+            
+            // Mark as read in Admin Panel
+            database.ref(`user_chats/${userId}`).update({ admin_unread: false });
+
+            // Listen for specific messages in this chat
+            database.ref(`chat_history/${userId}`).on('value', (snapshot) => {
+                const container = document.getElementById('chat-messages-container');
+                container.innerHTML = "";
+                snapshot.forEach(msgChild => {
+                    const msg = msgChild.val();
+                    const isAdmin = msg.role === 'admin';
+                    container.innerHTML += `
+                        <div class="max-w-[80%] p-3 text-xs ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">
+                            ${msg.text}
+                            <div class="text-[8px] mt-1 opacity-50 text-right">${msg.time}</div>
+                        </div>
+                    `;
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        async function sendReply() {
+            const input = document.getElementById('adminReplyInput');
+            const text = input.value;
+            if(!text || !activeChatUserID) return;
+
+            const replyObj = {
+                role: 'admin',
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            // 1. Add to chat history
+            await database.ref(`chat_history/${activeChatUserID}`).push(replyObj);
+
+            // 2. Update the main chat node for user notification
+            await database.ref(`user_chats/${activeChatUserID}`).update({
+                last_message: text,
+                user_unread: true, // This will trigger the Bell Icon on User side
+                last_update: Date.now()
+            });
+
+            input.value = "";
+        }
+
+        function closeChat() {
+            activeChatUserID = null;
+            document.getElementById('chat-window').classList.add('hidden');
+            document.getElementById('chat-placeholder').classList.remove('hidden');
+        }
+
+        // --- END Chat Functions ---
+
+        // (Baqi function purane wale hi hain)
         function updateLabel(id) {
             const label = document.getElementById('lbl'+id);
             label.classList.add('bg-blue-600/20', 'text-blue-400', 'border-blue-500');
@@ -268,5 +395,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>
