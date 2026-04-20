@@ -29,14 +29,13 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
         .overlay.active { display: block; }
 
-        /* Support Chat Modal Styles */
         #chat-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
         #chat-modal.active { display: flex; }
         .chat-bubble-admin { background: #eff6ff; color: #1e3a8a; align-self: flex-start; border-radius: 0 15px 15px 15px; border: 1px solid #dbeafe; }
         .chat-bubble-user { background: #2563eb; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
 
-        /* Fix for Chat Input Button */
-        .chat-input-container { padding: 12px; border-top: 1px solid #eee; background: white; display: flex; gap: 8px; align-items: center; }
+        /* FIX: Chat Input Alignment */
+        .chat-input-container { padding: 12px; border-top: 1px solid #eee; background: white; display: flex; gap: 8px; align-items: center; width: 100%; }
 
         .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; color: #1e293b; }
         .nav-btn i { color: #2563eb !important; }
@@ -86,9 +85,10 @@
                 <button onclick="closeChat()"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-slate-50"></div>
+            
             <div class="chat-input-container">
                 <input type="text" id="userReplyInput" class="flex-1 bg-slate-100 border-none p-3 rounded-xl outline-none text-xs" placeholder="Write a reply...">
-                <button onclick="sendReplyBack()" class="bg-blue-600 text-white p-3 rounded-xl min-w-[50px] flex items-center justify-center active:scale-95 transition">
+                <button onclick="sendReplyBack()" class="bg-blue-600 text-white p-3 rounded-xl min-w-[50px] flex-shrink-0 flex items-center justify-center active:scale-95 transition">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
@@ -197,23 +197,23 @@
         <div id="product-grid" class="grid grid-cols-2 gap-4"></div>
     </section>
 
-    <section id="contact" class="py-12 px-6 bg-slate-900 text-white rounded-t-[3rem]">
+    <section id="contact" class="py-12 px-6 bg-slate-900 text-white rounded-t-[3rem] mt-4">
         <div class="container mx-auto text-center">
-            <h2 class="text-2xl font-bold mb-6">Contact us</h2>
+            <h2 class="text-2xl font-bold mb-4">Contact us</h2>
             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8 text-left">
                 <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-3 outline-none text-white text-sm mb-4">
                 <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-3 outline-none h-20 text-white text-sm mb-6 resize-none"></textarea>
                 <button onclick="sendSupportMessage()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send Message</button>
             </div>
-            <div class="grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-1 gap-4">
                 <div class="flex flex-col items-center">
-                    <i class="fa-solid fa-location-dot text-blue-500 text-xl mb-1"></i>
-                    <h4 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Location</h4>
+                    <i class="fa-solid fa-location-dot text-blue-500 text-lg mb-1"></i>
+                    <h4 class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Location</h4>
                     <p class="text-xs opacity-80">Faisalabad, Pakistan</p>
                 </div>
                 <div class="flex flex-col items-center">
-                    <i class="fa-brands fa-whatsapp text-green-500 text-xl mb-1"></i>
-                    <h4 class="text-[10px] font-bold text-green-400 uppercase tracking-wider">WhatsApp</h4>
+                    <i class="fa-brands fa-whatsapp text-green-500 text-lg mb-1"></i>
+                    <h4 class="text-[10px] font-bold text-green-400 uppercase tracking-widest">WhatsApp</h4>
                     <p class="text-xs opacity-80">+92 370 4884772</p>
                 </div>
             </div>
