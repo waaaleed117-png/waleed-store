@@ -29,6 +29,12 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
         .overlay.active { display: block; }
 
+        /* Support Chat Modal Styles */
+        #chat-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        #chat-modal.active { display: flex; }
+        .chat-bubble-admin { background: #eff6ff; color: #1e3a8a; align-self: flex-start; border-radius: 0 15px 15px 15px; border: 1px solid #dbeafe; }
+        .chat-bubble-user { background: #2563eb; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
+
         .nav-btn { width: 100%; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: all 0.3s; color: #1e293b; }
         .nav-btn i { color: #2563eb !important; }
         .nav-btn:active { background: #f8fafc; color: #2563eb; }
@@ -52,12 +58,10 @@
         
         .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
 
-        /* EXACT LOGO STYLE */
         .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
         .brand-icon { width: 28px; height: 28px; margin-bottom: 1px; }
         .brand-name { font-size: 13px; font-weight: 900; line-height: 1; display: flex; align-items: center; letter-spacing: -0.5px; }
 
-        /* Quantity Controls Styling */
         .qty-btn { background: #f1f5f9; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; font-weight: bold; }
         .qty-input { width: 25px; text-align: center; font-size: 12px; font-weight: 700; }
     </style>
@@ -65,6 +69,29 @@
 <body class="bg-white">
 
     <div class="overlay" id="main-overlay" onclick="closeAllDrawers()"></div>
+
+    <div id="chat-modal">
+        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[70vh]">
+            <div class="bg-blue-600 p-4 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-headset text-xl"></i>
+                    <div>
+                        <h3 class="font-bold text-sm">Store Support</h3>
+                        <p class="text-[10px] opacity-80">Online | We're here to help</p>
+                    </div>
+                </div>
+                <button onclick="closeChat()"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-slate-50">
+                </div>
+            <div class="p-3 border-t bg-white flex gap-2">
+                <input type="text" id="userReplyInput" class="flex-1 bg-slate-100 border-none p-3 rounded-xl outline-none text-xs" placeholder="Write a reply...">
+                <button onclick="sendReplyBack()" class="bg-blue-600 text-white p-3 rounded-xl px-5 active:scale-95 transition">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="side-menu">
         <div class="p-6 border-b flex justify-between items-center bg-[#2563eb] text-white">
@@ -116,7 +143,11 @@
                     </div>
                 </a>
             </div>
-            <div class="flex justify-end">
+            <div class="flex justify-end items-center gap-3">
+                <div id="bell-container" class="relative hidden p-1 cursor-pointer" onclick="openChat()">
+                    <i class="fa-solid fa-bell text-xl text-blue-600"></i>
+                    <span class="absolute top-0 right-0 bg-red-500 w-2.5 h-2.5 rounded-full border-2 border-white animate-pulse"></span>
+                </div>
                 <div class="relative p-1 cursor-pointer" onclick="toggleCart()">
                     <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
                     <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
@@ -170,7 +201,7 @@
             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-10 text-left">
                 <input type="text" id="userName" placeholder="Your Full Name" class="w-full bg-transparent border-b border-white/20 py-2 outline-none text-white text-sm mb-4">
                 <textarea id="userMsg" placeholder="Type your order details here..." class="w-full bg-transparent border-b border-white/20 py-2 outline-none h-16 text-white text-sm mb-6"></textarea>
-                <button onclick="sendOrder()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send to WhatsApp</button>
+                <button onclick="sendSupportMessage()" class="w-full bg-blue-600 py-4 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition">Send Message</button>
             </div>
             <div class="grid grid-cols-1 gap-8">
                 <div>
@@ -205,6 +236,88 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // UNIQUE USER ID LOGIC
+        let userUUID = localStorage.getItem('user_chat_id');
+        if (!userUUID) {
+            userUUID = 'USER-' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('user_chat_id', userUUID);
+        }
+
+        // LISTEN FOR ADMIN REPLIES
+        database.ref(`user_chats/${userUUID}`).on('value', (snapshot) => {
+            const data = snapshot.val();
+            const bell = document.getElementById('bell-container');
+            if (data && data.user_unread === true) {
+                bell.classList.remove('hidden');
+            } else {
+                bell.classList.add('hidden');
+            }
+        });
+
+        async function openChat() {
+            document.getElementById('chat-modal').classList.add('active');
+            // Mark as read when user opens it
+            database.ref(`user_chats/${userUUID}`).update({ user_unread: false });
+            
+            // Load messages
+            database.ref(`chat_history/${userUUID}`).on('value', (snapshot) => {
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = "";
+                snapshot.forEach(child => {
+                    const msg = child.val();
+                    const isAdmin = msg.role === 'admin';
+                    container.innerHTML += `
+                        <div class="max-w-[85%] p-3 text-[11px] shadow-sm ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">
+                            ${msg.text}
+                            <div class="text-[8px] mt-1 opacity-60 text-right">${msg.time}</div>
+                        </div>`;
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        function closeChat() { document.getElementById('chat-modal').classList.remove('active'); }
+
+        async function sendSupportMessage() {
+            const name = document.getElementById('userName').value;
+            const msg = document.getElementById('userMsg').value;
+            if(!name || !msg) return alert("Fill all fields");
+
+            const msgObj = { role: 'user', text: msg, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
+            
+            await database.ref(`chat_history/${userUUID}`).push(msgObj);
+            await database.ref(`user_chats/${userUUID}`).update({
+                senderName: name,
+                last_message: msg,
+                admin_unread: true,
+                last_update: Date.now()
+            });
+
+            alert("Message sent! Watch for the bell icon for our reply.");
+            document.getElementById('userMsg').value = "";
+        }
+
+        async function sendReplyBack() {
+            const input = document.getElementById('userReplyInput');
+            if(!input.value) return;
+
+            const msgObj = { 
+                role: 'user', 
+                text: input.value, 
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+            };
+
+            await database.ref(`chat_history/${userUUID}`).push(msgObj);
+            await database.ref(`user_chats/${userUUID}`).update({
+                last_message: input.value,
+                admin_unread: true,
+                last_update: Date.now()
+            });
+
+            input.value = "";
+        }
+
+        // --- EXISTING STORE FUNCTIONS ---
         let currentSlide = 0;
         let imagesCount = 0;
         let autoSlideTimer;
@@ -271,9 +384,7 @@
 
         function startAutoSlide() {
             clearInterval(autoSlideTimer);
-            if(imagesCount > 1) {
-                autoSlideTimer = setInterval(nextSlide, 4500);
-            }
+            if(imagesCount > 1) autoSlideTimer = setInterval(nextSlide, 4500);
         }
 
         function setupSwipe() {
@@ -285,8 +396,7 @@
                 if (touchstartX - touchendX > 50) nextSlide();
                 if (touchendX - touchstartX > 50) {
                     currentSlide = (currentSlide - 1 + imagesCount) % imagesCount;
-                    updateSlider();
-                    startAutoSlide();
+                    updateSlider(); startAutoSlide();
                 }
             }, {passive: true});
         }
@@ -294,14 +404,10 @@
         function addToCart(id, name, price, img, originalPrice) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             let existingItem = cart.find(item => item.id === id);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({ id, name, price, img, quantity: 1, originalPrice: originalPrice });
-            }
+            if (existingItem) existingItem.quantity += 1;
+            else cart.push({ id, name, price, img, quantity: 1, originalPrice: originalPrice });
             localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            toggleCart();
+            updateCartCount(); toggleCart();
         }
 
         function updateQuantity(index, change) {
@@ -316,8 +422,7 @@
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             cart.splice(index, 1);
             localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            renderCart();
+            updateCartCount(); renderCart();
         }
 
         function renderCart() {
@@ -334,7 +439,6 @@
                         <div class="flex-grow">
                             <h4 class="font-bold text-[11px] truncate w-32">${item.name}</h4>
                             <p class="text-blue-600 font-bold text-xs">Rs. ${item.price}</p>
-                            
                             <div class="flex items-center mt-1 gap-2">
                                 <button onclick="updateQuantity(${index}, -1)" class="qty-btn"> - </button>
                                 <span class="qty-input">${item.quantity}</span>
@@ -350,18 +454,9 @@
         function updateCartCount() {
             const cartData = localStorage.getItem('cart');
             let cart = [];
-            try {
-                cart = cartData ? JSON.parse(cartData) : [];
-                if (!Array.isArray(cart)) cart = [];
-            } catch (e) {
-                cart = [];
-            }
-            
+            try { cart = cartData ? JSON.parse(cartData) : []; } catch (e) { cart = []; }
             const countEl = document.getElementById('cart-count');
-            if(countEl) {
-                let totalItems = cart.reduce((acc, item) => acc + (parseInt(item.quantity) || 0), 0);
-                countEl.innerText = totalItems;
-            }
+            if(countEl) countEl.innerText = cart.reduce((acc, item) => acc + (parseInt(item.quantity) || 0), 0);
         }
 
         updateCartCount();
@@ -389,13 +484,6 @@
                     </div>`;
             });
         });
-
-        function sendOrder() {
-            const name = document.getElementById('userName').value;
-            const msg = document.getElementById('userMsg').value;
-            if(!name || !msg) { alert("Please enter name and message"); return; }
-            window.open(`https://wa.me/923704884772?text=Name: ${name}%0AMessage: ${msg}`, '_blank');
-        }
 
         AOS.init({ duration: 1000, once: true });
     </script>
