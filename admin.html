@@ -24,7 +24,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden-section { display: none; }
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-left: 4px; display: block; margin-bottom: 5px; }
-        /* Chat UI Styles */
         .chat-bubble-admin { background: #3b82f6; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
         .chat-bubble-user { background: #1e293b; color: #e2e8f0; align-self: flex-start; border-radius: 15px 15px 15px 0; border: 1px solid #334155; }
     </style>
@@ -104,19 +103,23 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[70vh]">
                 <div class="glass-card p-4 overflow-y-auto space-y-3 border border-slate-800">
                     <h3 class="text-xs font-bold text-slate-500 uppercase px-2 mb-4">Active Conversations</h3>
-                    <div id="chat-users-list" class="space-y-2">
-                        </div>
+                    <div id="chat-users-list" class="space-y-2"></div>
                 </div>
                 <div id="chat-window" class="md:col-span-2 glass-card flex flex-col overflow-hidden hidden">
                     <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/30">
-                        <div>
-                            <h3 id="current-chat-user" class="font-bold text-blue-400">Select a user</h3>
-                            <p class="text-[10px] text-slate-400">Real-time Support</p>
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h3 id="current-chat-user" class="font-bold text-blue-400">User Name</h3>
+                                <p id="chat-user-status" class="text-[10px] text-slate-400">Offline</p>
+                            </div>
+                            <button id="bellToggleBtn" onclick="toggleUserBell()" class="text-[10px] font-bold px-3 py-1 rounded-full border transition"></button>
                         </div>
-                        <button onclick="closeChat()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        <div class="flex items-center gap-4">
+                            <button onclick="deleteConversation()" class="text-red-500 hover:text-red-400 text-sm" title="Delete Conversation"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="closeChat()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
                     </div>
-                    <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
-                        </div>
+                    <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3"></div>
                     <div class="p-4 bg-slate-800/50 border-t border-slate-800 flex gap-2">
                         <input type="text" id="adminReplyInput" class="flex-1 bg-slate-900 border border-slate-700 p-3 rounded-xl outline-none text-sm" placeholder="Type your reply...">
                         <button onclick="sendReply()" class="bg-blue-600 p-3 rounded-xl px-6 font-bold hover:bg-blue-500 transition"><i class="fa-solid fa-paper-plane"></i></button>
@@ -152,8 +155,8 @@
         const database = firebase.database();
         const imgbbKey = "2d7d1d644318674d9d8dcd961cb666ae";
 
-        // Global state for chat
         let activeChatUserID = null;
+        let isBellOn = false;
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
         function closeModal() { document.getElementById('orderModal').classList.remove('active'); }
@@ -166,9 +169,8 @@
             if(window.innerWidth < 768) toggleSidebar();
         }
 
-        // --- NEW: Chat Management Functions ---
+        // --- Chat & Support Management ---
 
-        // Listen for all messages sent by users
         database.ref('user_chats').on('value', (snapshot) => {
             const list = document.getElementById('chat-users-list');
             const notifDot = document.getElementById('msg-notif-dot');
@@ -178,7 +180,6 @@
             snapshot.forEach(child => {
                 const chatData = child.val();
                 const userId = child.key;
-                const lastMsg = chatData.last_message || "New Conversation";
                 const isUnread = chatData.admin_unread === true;
                 if(isUnread) hasNew = true;
 
@@ -186,11 +187,13 @@
                     <div onclick="openChat('${userId}', '${chatData.senderName}')" class="p-3 rounded-xl transition cursor-pointer flex justify-between items-center ${activeChatUserID === userId ? 'bg-blue-600/20 border border-blue-500/30' : 'hover:bg-slate-800/50 border border-transparent'}">
                         <div>
                             <h4 class="text-sm font-bold ${isUnread ? 'text-white' : 'text-slate-400'}">${chatData.senderName || 'Anonymous'}</h4>
-                            <p class="text-[10px] text-slate-500 truncate w-32">${lastMsg}</p>
+                            <p class="text-[10px] text-slate-500 truncate w-32">${chatData.last_message || 'No messages'}</p>
                         </div>
-                        ${isUnread ? '<span class="w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
-                    </div>
-                `;
+                        <div class="flex items-center gap-2">
+                            ${chatData.user_seen ? '<i class="fa-solid fa-check-double text-blue-500 text-[10px]"></i>' : ''}
+                            ${isUnread ? '<span class="w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
+                        </div>
+                    </div>`;
             });
             notifDot.classList.toggle('hidden', !hasNew);
         });
@@ -201,10 +204,19 @@
             document.getElementById('chat-placeholder').classList.add('hidden');
             document.getElementById('current-chat-user').innerText = name;
             
-            // Mark as read in Admin Panel
             database.ref(`user_chats/${userId}`).update({ admin_unread: false });
 
-            // Listen for specific messages in this chat
+            // Monitor Bell Status & Seen Status
+            database.ref(`user_chats/${userId}`).on('value', snap => {
+                const data = snap.val();
+                if(!data) return;
+                isBellOn = data.show_bell === true;
+                const btn = document.getElementById('bellToggleBtn');
+                btn.innerText = isBellOn ? "BELL ON" : "BELL OFF";
+                btn.className = isBellOn ? "text-[10px] font-bold px-3 py-1 rounded-full border border-green-500 text-green-500 bg-green-500/10" : "text-[10px] font-bold px-3 py-1 rounded-full border border-slate-600 text-slate-500";
+                document.getElementById('chat-user-status').innerText = data.user_seen ? "User is active" : "Offline";
+            });
+
             database.ref(`chat_history/${userId}`).on('value', (snapshot) => {
                 const container = document.getElementById('chat-messages-container');
                 container.innerHTML = "";
@@ -215,8 +227,7 @@
                         <div class="max-w-[80%] p-3 text-xs ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">
                             ${msg.text}
                             <div class="text-[8px] mt-1 opacity-50 text-right">${msg.time}</div>
-                        </div>
-                    `;
+                        </div>`;
                 });
                 container.scrollTop = container.scrollHeight;
             });
@@ -227,23 +238,31 @@
             const text = input.value;
             if(!text || !activeChatUserID) return;
 
-            const replyObj = {
-                role: 'admin',
-                text: text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            // 1. Add to chat history
+            const replyObj = { role: 'admin', text: text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
             await database.ref(`chat_history/${activeChatUserID}`).push(replyObj);
 
-            // 2. Update the main chat node for user notification
+            // Send reply and automatically turn on Bell icon for user
             await database.ref(`user_chats/${activeChatUserID}`).update({
                 last_message: text,
-                user_unread: true, // This will trigger the Bell Icon on User side
+                show_bell: true, // Auto-on bell when admin replies
                 last_update: Date.now()
             });
-
             input.value = "";
+        }
+
+        async function toggleUserBell() {
+            if(!activeChatUserID) return;
+            await database.ref(`user_chats/${activeChatUserID}`).update({ show_bell: !isBellOn });
+        }
+
+        async function deleteConversation() {
+            if(!activeChatUserID) return;
+            if(confirm("Are you sure? This will delete all chat history for this user.")){
+                await database.ref(`chat_history/${activeChatUserID}`).remove();
+                await database.ref(`user_chats/${activeChatUserID}`).remove();
+                closeChat();
+                alert("Conversation Deleted.");
+            }
         }
 
         function closeChat() {
@@ -252,9 +271,8 @@
             document.getElementById('chat-placeholder').classList.remove('hidden');
         }
 
-        // --- END Chat Functions ---
+        // --- Store Management (Slider, Products, Orders) ---
 
-        // (Baqi function purane wale hi hain)
         function updateLabel(id) {
             const label = document.getElementById('lbl'+id);
             label.classList.add('bg-blue-600/20', 'text-blue-400', 'border-blue-500');
@@ -273,11 +291,7 @@
                 const d = await res.json();
                 await database.ref('slider').push({ url: d.data.url });
                 status.innerText = "Click to upload banner (Professional Look)";
-                alert("Slider Image Uploaded!");
-            } catch (e) {
-                alert("Upload failed!");
-                status.innerText = "Click to upload banner (Professional Look)";
-            }
+            } catch (e) { alert("Upload failed!"); }
         }
 
         database.ref('slider').on('value', (snapshot) => {
