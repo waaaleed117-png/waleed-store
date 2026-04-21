@@ -34,7 +34,6 @@
         .chat-bubble-admin { background: #eff6ff; color: #1e3a8a; align-self: flex-start; border-radius: 0 15px 15px 15px; border: 1px solid #dbeafe; }
         .chat-bubble-user { background: #2563eb; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
 
-        /* FIX 1: Chat Input Alignment */
         .chat-input-container { padding: 12px; border-top: 1px solid #eee; background: white; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; gap: 8px; align-items: center; width: 100%; overflow: hidden; }
         #userReplyInput { flex: 1 !important; min-width: 0; }
 
@@ -245,10 +244,11 @@
             localStorage.setItem('user_chat_id', userUUID);
         }
 
+        // Updated Bell Display Logic (Controlled by Admin show_bell field)
         database.ref(`user_chats/${userUUID}`).on('value', (snapshot) => {
             const data = snapshot.val();
             const bell = document.getElementById('bell-container');
-            if (data && data.user_unread === true) {
+            if (data && data.show_bell === true) {
                 bell.classList.remove('hidden');
             } else {
                 bell.classList.add('hidden');
@@ -257,7 +257,9 @@
 
         async function openChat() {
             document.getElementById('chat-modal').classList.add('active');
-            database.ref(`user_chats/${userUUID}`).update({ user_unread: false });
+            
+            // Set user_seen true when chat is opened (Admin can see double tick)
+            database.ref(`user_chats/${userUUID}`).update({ user_seen: true });
             
             database.ref(`chat_history/${userUUID}`).on('value', (snapshot) => {
                 const container = document.getElementById('chat-messages');
@@ -284,7 +286,14 @@
 
             const msgObj = { role: 'user', text: msg, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
             await database.ref(`chat_history/${userUUID}`).push(msgObj);
-            await database.ref(`user_chats/${userUUID}`).update({ senderName: name, last_message: msg, admin_unread: true, last_update: Date.now() });
+            
+            // Update admin unread status
+            await database.ref(`user_chats/${userUUID}`).update({ 
+                senderName: name, 
+                last_message: msg, 
+                admin_unread: true, 
+                last_update: Date.now() 
+            });
             alert("Message sent!");
             document.getElementById('userMsg').value = "";
         }
@@ -294,7 +303,12 @@
             if(!input.value) return;
             const msgObj = { role: 'user', text: input.value, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
             await database.ref(`chat_history/${userUUID}`).push(msgObj);
-            await database.ref(`user_chats/${userUUID}`).update({ last_message: input.value, admin_unread: true, last_update: Date.now() });
+            
+            await database.ref(`user_chats/${userUUID}`).update({ 
+                last_message: input.value, 
+                admin_unread: true, 
+                last_update: Date.now() 
+            });
             input.value = "";
         }
 
