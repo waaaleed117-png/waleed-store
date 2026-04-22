@@ -55,12 +55,12 @@
         .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: default; }
         .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; }
 
-        .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; text-align: center; transform: translateZ(0); }
+        .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; text-align: center; transform: translateZ(0); will-change: transform; }
         .badge-box i { font-size: 1.3rem; margin-bottom: 4px; color: #2563eb; } 
         .badge-box h4 { font-size: 9px; font-weight: 800; color: #0f172a; margin-bottom: 1px; text-transform: uppercase; }
         .badge-box span { font-size: 7px; font-weight: 700; color: #64748b; text-transform: uppercase; }
 
-        .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: transform 0.3s ease; overflow: hidden; display: flex; flex-direction: column; transform: translateZ(0); }
+        .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: transform 0.3s ease; overflow: hidden; display: flex; flex-direction: column; transform: translateZ(0); will-change: transform; }
         .add-to-cart-btn { background: #1e3a8a; color: white; width: 100%; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; cursor: pointer; }
         
         /* Performance Fix: Premium Text Flow Animation */
@@ -250,7 +250,8 @@
             duration: 600,
             once: true,
             offset: 50,
-            easing: 'ease-out'
+            easing: 'ease-out',
+            startEvent: 'load' // Fix: Pehle images load hon phr animation
         });
 
         const firebaseConfig = {
@@ -369,6 +370,7 @@
                 snapshot.forEach(child => {
                     const img = document.createElement('img');
                     img.src = child.val().url;
+                    img.loading = "eager"; // Fix: Slider image pehle load ho
                     img.className = `slider-img ${index === 0 ? 'active' : ''}`;
                     wrapper.appendChild(img);
                     const dot = document.createElement('div');
@@ -468,7 +470,7 @@
                 grid.innerHTML += `
                     <div class="product-card p-2" data-aos="fade-up">
                         <div class="rounded-xl overflow-hidden aspect-square mb-2 relative bg-slate-50" onclick="window.location.href='product.html?id=${id}'">
-                            <img src="${firstImage}" class="w-full h-full object-cover">
+                            <img src="${firstImage}" class="w-full h-full object-cover" loading="lazy">
                         </div>
                         <div class="px-1 flex flex-col justify-between flex-grow">
                             <h3 class="font-bold text-[11px] text-slate-800 truncate">${p.name}</h3>
