@@ -14,19 +14,24 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-        html, body { max-width: 100%; overflow-x: hidden; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
-        .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
-        .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
-        .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        html, body { max-width: 100%; overflow-x: hidden; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
         
-        #side-cart, #side-menu { position: fixed; top: 0; height: 100%; background: white; z-index: 1000; transition: 0.4s ease-in-out; box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        /* Performance Fix: Optimized Glass Effect */
+        .glass { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); position: sticky; top: 0; transform: translateZ(0); }
+        
+        .hero-bg { background: radial-gradient(circle at top right, #1e3a8a, #020617); }
+        
+        /* Performance Fix: Floating Animation */
+        .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; will-change: transform; }
+        @keyframes floating { 0%, 100% { transform: translateY(0px) translateZ(0); } 50% { transform: translateY(-10px) translateZ(0); } }
+        
+        #side-cart, #side-menu { position: fixed; top: 0; height: 100%; background: white; z-index: 1000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; will-change: transform; }
         #side-cart { right: -100%; width: 85%; max-width: 400px; }
         #side-cart.active { right: 0; }
         #side-menu { left: -100%; width: 75%; max-width: 300px; }
         #side-menu.active { left: 0; }
         
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; will-change: opacity; }
         .overlay.active { display: block; }
 
         #chat-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
@@ -41,31 +46,32 @@
         .nav-btn i { color: #2563eb !important; }
         .nav-btn:active { background: #f8fafc; color: #2563eb; }
 
-        .slider-container { width: 100%; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #020617; overflow: hidden; cursor: pointer; }
+        .slider-container { width: 100%; position: relative; border-radius: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); aspect-ratio: 1/1; background: #020617; overflow: hidden; cursor: pointer; transform: translateZ(0); }
         .slider-wrapper { position: relative; width: 100%; height: 100%; }
-        .slider-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; z-index: 1; }
+        .slider-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out; z-index: 1; will-change: opacity; }
         .slider-img.active { opacity: 1; z-index: 10; }
 
         .dots-container { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; cursor: default; }
         .dot.active { background: #3b82f6; width: 24px; border-radius: 10px; }
 
-        .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .badge-box { background: white; padding: 12px 2px; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; text-align: center; transform: translateZ(0); }
         .badge-box i { font-size: 1.3rem; margin-bottom: 4px; color: #2563eb; } 
         .badge-box h4 { font-size: 9px; font-weight: 800; color: #0f172a; margin-bottom: 1px; text-transform: uppercase; }
         .badge-box span { font-size: 7px; font-weight: 700; color: #64748b; text-transform: uppercase; }
 
-        .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: all 0.3s ease; overflow: hidden; display: flex; flex-direction: column; }
+        .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: transform 0.3s ease; overflow: hidden; display: flex; flex-direction: column; transform: translateZ(0); }
         .add-to-cart-btn { background: #1e3a8a; color: white; width: 100%; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; cursor: pointer; }
         
-        /* Updated Premium Text with Color Flow Animation */
+        /* Performance Fix: Premium Text Flow Animation */
         .premium-text { 
             background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6, #c084fc, #60a5fa); 
             background-size: 200% auto;
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
             font-weight: 800; 
-            animation: textFlow 3s linear infinite;
+            animation: textFlow 4s linear infinite;
+            will-change: background-position;
         }
 
         @keyframes textFlow {
@@ -239,11 +245,12 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // AOS Initialization
+        // AOS Initialization - Optimized for mobile scrolling
         AOS.init({
-            duration: 800,
+            duration: 600,
             once: true,
-            easing: 'ease-out-quad'
+            offset: 50,
+            easing: 'ease-out'
         });
 
         const firebaseConfig = {
@@ -349,7 +356,8 @@
 
         function scrollToSection(id) {
             closeAllDrawers();
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
         }
 
         database.ref('slider').on('value', (snapshot) => {
@@ -472,7 +480,6 @@
                         </div>
                     </div>`;
             });
-            // Re-refresh AOS after new products load
             AOS.refresh();
         });
     </script>
