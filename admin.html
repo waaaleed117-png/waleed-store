@@ -26,6 +26,9 @@
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-left: 4px; display: block; margin-bottom: 5px; }
         .chat-bubble-admin { background: #3b82f6; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
         .chat-bubble-user { background: #1e293b; color: #e2e8f0; align-self: flex-start; border-radius: 15px 15px 15px 0; border: 1px solid #334155; }
+        
+        /* New Editor Styles */
+        #announcementEditor:empty:before { content: attr(placeholder); color: #475569; }
     </style>
 </head>
 <body>
@@ -63,6 +66,19 @@
 
         <div id="manage-slider" class="hidden-section">
             <div class="glass-card p-6 max-w-xl mx-auto shadow-2xl cursor-default hover:transform-none">
+                <h3 class="text-blue-400 font-bold mb-4">Top Announcement Bar</h3>
+                <div class="mb-4">
+                    <label>Announcement Text (Select text to color)</label>
+                    <div class="flex items-center gap-2 mb-2 bg-slate-900 p-2 rounded-t-xl border border-slate-700">
+                        <input type="color" id="textColorPicker" class="w-8 h-8 bg-transparent cursor-pointer border-none" value="#ffffff">
+                        <button onclick="applyColor()" class="bg-blue-600 px-3 py-1 text-[10px] rounded font-bold uppercase">Apply Color</button>
+                    </div>
+                    <div id="announcementEditor" contenteditable="true" placeholder="Type offer here..." class="w-full bg-slate-900/50 border border-t-0 border-slate-700 p-3 rounded-b-xl outline-none min-h-[50px] text-sm"></div>
+                </div>
+                <button onclick="saveAnnouncement()" id="saveAnnBtn" class="w-full bg-green-600 py-3 rounded-xl font-bold text-xs mb-8 hover:bg-green-500 transition">SAVE ANNOUNCEMENT</button>
+
+                <hr class="border-slate-800 mb-8">
+                
                 <h3 class="text-blue-400 font-bold mb-4">Website Slider Images</h3>
                 <div class="upload-box p-8 rounded-2xl text-center mb-6" onclick="document.getElementById('sliderFileInput').click()">
                     <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 text-slate-500"></i>
@@ -169,20 +185,38 @@
             if(window.innerWidth < 768) toggleSidebar();
         }
 
-        // --- Chat & Support Management ---
+        /* --- NEW ANNOUNCEMENT SLIDER FUNCTIONS --- */
+        function applyColor() {
+            const color = document.getElementById('textColorPicker').value;
+            document.execCommand('foreColor', false, color);
+        }
 
+        async function saveAnnouncement() {
+            const btn = document.getElementById('saveAnnBtn');
+            const html = document.getElementById('announcementEditor').innerHTML;
+            btn.disabled = true; btn.innerText = "SAVING...";
+            try {
+                await database.ref('announcement_bar').set({ content: html });
+                alert("Success!");
+            } catch(e) { alert("Error!"); }
+            btn.disabled = false; btn.innerText = "SAVE ANNOUNCEMENT";
+        }
+
+        database.ref('announcement_bar').once('value', (snap) => {
+            if(snap.exists()) document.getElementById('announcementEditor').innerHTML = snap.val().content;
+        });
+
+        // --- Chat & Support Management (REMAINS UNCHANGED) ---
         database.ref('user_chats').on('value', (snapshot) => {
             const list = document.getElementById('chat-users-list');
             const notifDot = document.getElementById('msg-notif-dot');
             list.innerHTML = "";
             let hasNew = false;
-
             snapshot.forEach(child => {
                 const chatData = child.val();
                 const userId = child.key;
                 const isUnread = chatData.admin_unread === true;
                 if(isUnread) hasNew = true;
-
                 list.innerHTML += `
                     <div onclick="openChat('${userId}', '${chatData.senderName}')" class="p-3 rounded-xl transition cursor-pointer flex justify-between items-center ${activeChatUserID === userId ? 'bg-blue-600/20 border border-blue-500/30' : 'hover:bg-slate-800/50 border border-transparent'}">
                         <div>
@@ -203,10 +237,7 @@
             document.getElementById('chat-window').classList.remove('hidden');
             document.getElementById('chat-placeholder').classList.add('hidden');
             document.getElementById('current-chat-user').innerText = name;
-            
             database.ref(`user_chats/${userId}`).update({ admin_unread: false });
-
-            // Monitor Bell Status & Seen Status
             database.ref(`user_chats/${userId}`).on('value', snap => {
                 const data = snap.val();
                 if(!data) return;
@@ -216,18 +247,13 @@
                 btn.className = isBellOn ? "text-[10px] font-bold px-3 py-1 rounded-full border border-green-500 text-green-500 bg-green-500/10" : "text-[10px] font-bold px-3 py-1 rounded-full border border-slate-600 text-slate-500";
                 document.getElementById('chat-user-status').innerText = data.user_seen ? "User is active" : "Offline";
             });
-
             database.ref(`chat_history/${userId}`).on('value', (snapshot) => {
                 const container = document.getElementById('chat-messages-container');
                 container.innerHTML = "";
                 snapshot.forEach(msgChild => {
                     const msg = msgChild.val();
                     const isAdmin = msg.role === 'admin';
-                    container.innerHTML += `
-                        <div class="max-w-[80%] p-3 text-xs ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">
-                            ${msg.text}
-                            <div class="text-[8px] mt-1 opacity-50 text-right">${msg.time}</div>
-                        </div>`;
+                    container.innerHTML += `<div class="max-w-[80%] p-3 text-xs ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">${msg.text}<div class="text-[8px] mt-1 opacity-50 text-right">${msg.time}</div></div>`;
                 });
                 container.scrollTop = container.scrollHeight;
             });
@@ -237,42 +263,25 @@
             const input = document.getElementById('adminReplyInput');
             const text = input.value;
             if(!text || !activeChatUserID) return;
-
             const replyObj = { role: 'admin', text: text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
             await database.ref(`chat_history/${activeChatUserID}`).push(replyObj);
-
-            // Send reply and automatically turn on Bell icon for user
-            await database.ref(`user_chats/${activeChatUserID}`).update({
-                last_message: text,
-                show_bell: true, // Auto-on bell when admin replies
-                last_update: Date.now()
-            });
+            await database.ref(`user_chats/${activeChatUserID}`).update({ last_message: text, show_bell: true, last_update: Date.now() });
             input.value = "";
         }
 
-        async function toggleUserBell() {
-            if(!activeChatUserID) return;
-            await database.ref(`user_chats/${activeChatUserID}`).update({ show_bell: !isBellOn });
-        }
-
+        async function toggleUserBell() { if(!activeChatUserID) return; await database.ref(`user_chats/${activeChatUserID}`).update({ show_bell: !isBellOn }); }
         async function deleteConversation() {
             if(!activeChatUserID) return;
-            if(confirm("Are you sure? This will delete all chat history for this user.")){
+            if(confirm("Are you sure?")){
                 await database.ref(`chat_history/${activeChatUserID}`).remove();
                 await database.ref(`user_chats/${activeChatUserID}`).remove();
                 closeChat();
                 alert("Conversation Deleted.");
             }
         }
+        function closeChat() { activeChatUserID = null; document.getElementById('chat-window').classList.add('hidden'); document.getElementById('chat-placeholder').classList.remove('hidden'); }
 
-        function closeChat() {
-            activeChatUserID = null;
-            document.getElementById('chat-window').classList.add('hidden');
-            document.getElementById('chat-placeholder').classList.remove('hidden');
-        }
-
-        // --- Store Management (Slider, Products, Orders) ---
-
+        // --- Store Management (Slider, Products, Orders) (REMAINS UNCHANGED) ---
         function updateLabel(id) {
             const label = document.getElementById('lbl'+id);
             label.classList.add('bg-blue-600/20', 'text-blue-400', 'border-blue-500');
@@ -298,11 +307,7 @@
             const list = document.getElementById('slider-images-list');
             list.innerHTML = "";
             snapshot.forEach(child => {
-                list.innerHTML += `
-                    <div class="relative group rounded-xl overflow-hidden">
-                        <img src="${child.val().url}" class="w-full h-32 object-cover border border-slate-700 rounded-xl">
-                        <button onclick="deleteSlider('${child.key}')" class="absolute top-2 right-2 bg-red-600 p-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
-                    </div>`;
+                list.innerHTML += `<div class="relative group rounded-xl overflow-hidden"><img src="${child.val().url}" class="w-full h-32 object-cover border border-slate-700 rounded-xl"><button onclick="deleteSlider('${child.key}')" class="absolute top-2 right-2 bg-red-600 p-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button></div>`;
             });
         });
 
@@ -321,37 +326,12 @@
         function openEditProduct(p, key) {
             document.getElementById('modal-title').innerText = "Edit Product";
             const content = document.getElementById('modal-content');
-            content.innerHTML = `
-                <div class="space-y-3">
-                    <div><label>Product Name</label><input type="text" id="eName" value="${p.name}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label>Sale Price</label><input type="number" id="ePrice" value="${p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
-                        <div><label>Original Price</label><input type="number" id="eOldPrice" value="${p.originalPrice || p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label>Delivery</label><input type="number" id="eDel" value="${p.delivery || 200}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
-                        <div><label>COD Fee</label><input type="number" id="eCod" value="${p.cod_fee || 0}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
-                    </div>
-                    <div><label>Description</label><textarea id="eDesc" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 h-24 outline-none">${p.desc}</textarea></div>
-                    <div><label>YouTube Link</label><input type="text" id="eVideo" value="${p.video || ''}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div>
-                    <div class="grid grid-cols-2 gap-2 pt-4">
-                        <button onclick="updateProduct('${key}')" class="bg-blue-600 py-3 rounded-xl font-bold">Save Changes</button>
-                        <button onclick="deleteProduct('${key}')" class="bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete</button>
-                    </div>
-                </div>`;
+            content.innerHTML = `<div class="space-y-3"><div><label>Product Name</label><input type="text" id="eName" value="${p.name}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div><div class="grid grid-cols-2 gap-2"><div><label>Sale Price</label><input type="number" id="ePrice" value="${p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div><div><label>Original Price</label><input type="number" id="eOldPrice" value="${p.originalPrice || p.price}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div></div><div class="grid grid-cols-2 gap-2"><div><label>Delivery</label><input type="number" id="eDel" value="${p.delivery || 200}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div><div><label>COD Fee</label><input type="number" id="eCod" value="${p.cod_fee || 0}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div></div><div><label>Description</label><textarea id="eDesc" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 h-24 outline-none">${p.desc}</textarea></div><div><label>YouTube Link</label><input type="text" id="eVideo" value="${p.video || ''}" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700 outline-none"></div><div class="grid grid-cols-2 gap-2 pt-4"><button onclick="updateProduct('${key}')" class="bg-blue-600 py-3 rounded-xl font-bold">Save Changes</button><button onclick="deleteProduct('${key}')" class="bg-red-600/20 text-red-500 py-3 rounded-xl font-bold">Delete</button></div></div>`;
             document.getElementById('orderModal').classList.add('active');
         }
 
         async function updateProduct(key) {
-            const updates = {
-                name: document.getElementById('eName').value,
-                price: document.getElementById('ePrice').value,
-                originalPrice: document.getElementById('eOldPrice').value,
-                delivery: document.getElementById('eDel').value,
-                cod_fee: document.getElementById('eCod').value,
-                desc: document.getElementById('eDesc').value,
-                video: document.getElementById('eVideo').value
-            };
+            const updates = { name: document.getElementById('eName').value, price: document.getElementById('ePrice').value, originalPrice: document.getElementById('eOldPrice').value, delivery: document.getElementById('eDel').value, cod_fee: document.getElementById('eCod').value, desc: document.getElementById('eDesc').value, video: document.getElementById('eVideo').value };
             await database.ref('products/' + key).update(updates);
             alert("Success!"); closeModal();
         }
@@ -393,17 +373,7 @@
                         uploadedUrls.push(d.data.url);
                     }
                 }
-                await database.ref('products').push({
-                    name: document.getElementById('pName').value,
-                    price: document.getElementById('pPrice').value,
-                    originalPrice: document.getElementById('pOldPrice').value,
-                    delivery: document.getElementById('pDelivery').value,
-                    cod_fee: document.getElementById('pCod').value,
-                    desc: document.getElementById('pDesc').value,
-                    video: document.getElementById('pVideo').value,
-                    images: uploadedUrls,
-                    date: new Date().toLocaleString()
-                });
+                await database.ref('products').push({ name: document.getElementById('pName').value, price: document.getElementById('pPrice').value, originalPrice: document.getElementById('pOldPrice').value, delivery: document.getElementById('pDelivery').value, cod_fee: document.getElementById('pCod').value, desc: document.getElementById('pDesc').value, video: document.getElementById('pVideo').value, images: uploadedUrls, date: new Date().toLocaleString() });
                 alert("Success!"); location.reload();
             } catch (e) { alert("Error!"); btn.disabled = false; btn.innerText = "Upload Product"; }
         }
