@@ -66,9 +66,15 @@
 
         .qty-btn { background: #f1f5f9; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; font-weight: bold; }
         .qty-input { width: 25px; text-align: center; font-size: 12px; font-weight: 700; }
+
+        /* Announcement Bar Style */
+        #announcement-bar { background: #1e293b; color: white; text-align: center; padding: 8px 10px; font-size: 10px; font-weight: 700; position: fixed; top: 0; width: 100%; z-index: 1001; transition: 0.3s; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-with-announcement { top: 32px !important; } /* Push nav down when bar exists */
     </style>
 </head>
 <body class="bg-white">
+
+    <div id="announcement-bar" class="hidden"></div>
 
     <div class="overlay" id="main-overlay" onclick="closeAllDrawers()"></div>
 
@@ -125,7 +131,7 @@
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <nav class="glass fixed w-full top-0 z-50 px-4 py-1 border-b border-slate-100">
+    <nav id="main-nav" class="glass fixed w-full top-0 z-50 px-4 py-1 border-b border-slate-100">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleMenu()" class="p-2">
@@ -158,7 +164,7 @@
         </div>
     </nav>
 
-    <header id="top" class="hero-bg pt-28 pb-16 text-white text-center px-4">
+    <header id="top" class="hero-bg pt-32 pb-16 text-white text-center px-4">
         <div data-aos="fade-down" class="mb-6">
             <h1 class="text-3xl font-extrabold mb-2"><span class="premium-text">Premium Quality</span></h1>
             <p class="text-slate-300 text-xs opacity-80">Your trust is our priority. Order now.</p>
@@ -244,6 +250,20 @@
             localStorage.setItem('user_chat_id', userUUID);
         }
 
+        /* --- ANNOUNCEMENT BAR SYNC --- */
+        database.ref('announcement_bar').on('value', (snapshot) => {
+            const bar = document.getElementById('announcement-bar');
+            const nav = document.getElementById('main-nav');
+            if(snapshot.exists() && snapshot.val().content.trim() !== "") {
+                bar.innerHTML = snapshot.val().content;
+                bar.classList.remove('hidden');
+                nav.classList.add('nav-with-announcement');
+            } else {
+                bar.classList.add('hidden');
+                nav.classList.remove('nav-with-announcement');
+            }
+        });
+
         // Updated Bell Display Logic (Controlled by Admin show_bell field)
         database.ref(`user_chats/${userUUID}`).on('value', (snapshot) => {
             const data = snapshot.val();
@@ -257,21 +277,14 @@
 
         async function openChat() {
             document.getElementById('chat-modal').classList.add('active');
-            
-            // Set user_seen true when chat is opened (Admin can see double tick)
             database.ref(`user_chats/${userUUID}`).update({ user_seen: true });
-            
             database.ref(`chat_history/${userUUID}`).on('value', (snapshot) => {
                 const container = document.getElementById('chat-messages');
                 container.innerHTML = "";
                 snapshot.forEach(child => {
                     const msg = child.val();
                     const isAdmin = msg.role === 'admin';
-                    container.innerHTML += `
-                        <div class="max-w-[85%] p-3 text-[11px] shadow-sm ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">
-                            ${msg.text}
-                            <div class="text-[8px] mt-1 opacity-60 text-right">${msg.time}</div>
-                        </div>`;
+                    container.innerHTML += `<div class="max-w-[85%] p-3 text-[11px] shadow-sm ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">${msg.text}<div class="text-[8px] mt-1 opacity-60 text-right">${msg.time}</div></div>`;
                 });
                 container.scrollTop = container.scrollHeight;
             });
@@ -283,17 +296,9 @@
             const name = document.getElementById('userName').value;
             const msg = document.getElementById('userMsg').value;
             if(!name || !msg) return alert("Fill all fields");
-
             const msgObj = { role: 'user', text: msg, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
             await database.ref(`chat_history/${userUUID}`).push(msgObj);
-            
-            // Update admin unread status
-            await database.ref(`user_chats/${userUUID}`).update({ 
-                senderName: name, 
-                last_message: msg, 
-                admin_unread: true, 
-                last_update: Date.now() 
-            });
+            await database.ref(`user_chats/${userUUID}`).update({ senderName: name, last_message: msg, admin_unread: true, last_update: Date.now() });
             alert("Message sent!");
             document.getElementById('userMsg').value = "";
         }
@@ -303,12 +308,7 @@
             if(!input.value) return;
             const msgObj = { role: 'user', text: input.value, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
             await database.ref(`chat_history/${userUUID}`).push(msgObj);
-            
-            await database.ref(`user_chats/${userUUID}`).update({ 
-                last_message: input.value, 
-                admin_unread: true, 
-                last_update: Date.now() 
-            });
+            await database.ref(`user_chats/${userUUID}`).update({ last_message: input.value, admin_unread: true, last_update: Date.now() });
             input.value = "";
         }
 
