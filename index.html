@@ -58,7 +58,20 @@
         .product-card { background: white; border-radius: 1.2rem; border: 1px solid #f1f5f9; transition: all 0.3s ease; overflow: hidden; display: flex; flex-direction: column; }
         .add-to-cart-btn { background: #1e3a8a; color: white; width: 100%; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; cursor: pointer; }
         
-        .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        /* Updated Premium Text with Color Flow Animation */
+        .premium-text { 
+            background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6, #c084fc, #60a5fa); 
+            background-size: 200% auto;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            font-weight: 800; 
+            animation: textFlow 3s linear infinite;
+        }
+
+        @keyframes textFlow {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
 
         .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
         .brand-icon { width: 28px; height: 28px; margin-bottom: 1px; }
