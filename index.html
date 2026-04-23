@@ -20,16 +20,17 @@
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
-        #side-cart, #side-menu { position: fixed; top: 0; height: 100%; background: white; z-index: 1000; transition: 0.4s ease-in-out; box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        /* FIX: Side menu z-index increased to be above announcement bar */
+        #side-cart, #side-menu { position: fixed; top: 0; height: 100%; background: white; z-index: 10000; transition: 0.4s ease-in-out; box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         #side-cart { right: -100%; width: 85%; max-width: 400px; }
         #side-cart.active { right: 0; }
         #side-menu { left: -100%; width: 75%; max-width: 300px; }
         #side-menu.active { left: 0; }
         
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: none; }
         .overlay.active { display: block; }
 
-        #chat-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        #chat-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 20000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
         #chat-modal.active { display: flex; }
         .chat-bubble-admin { background: #eff6ff; color: #1e3a8a; align-self: flex-start; border-radius: 0 15px 15px 15px; border: 1px solid #dbeafe; }
         .chat-bubble-user { background: #2563eb; color: white; align-self: flex-end; border-radius: 15px 15px 0 15px; }
@@ -67,7 +68,7 @@
         .qty-btn { background: #f1f5f9; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; font-weight: bold; }
         .qty-input { width: 25px; text-align: center; font-size: 12px; font-weight: 700; }
 
-        /* --- UPDATED ANNOUNCEMENT BAR FOR INFINITE LOOP --- */
+        /* --- UPDATED: POSITION ABSOLUTE TO HIDE ON SCROLL --- */
         #announcement-bar { 
             background: #000000;
             color: white; 
@@ -75,36 +76,24 @@
             padding: 10px 0; 
             font-size: 11px; 
             font-weight: 700; 
-            position: fixed; 
+            position: absolute; /* Fixed se Absolute kar diya taake scroll ho kar upar jaye */
             top: 0; 
             width: 100%; 
-            z-index: 1001; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            z-index: 100; 
             overflow: hidden; 
         }
-        .marquee-container {
-            display: flex;
-            width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .scrolling-content {
-            display: inline-block;
-            white-space: nowrap;
-            padding-right: 50px;
-            animation: infinite-scroll 12s linear infinite;
-        }
-        @keyframes infinite-scroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-        .nav-with-announcement { top: 38px !important; }
+        .marquee-container { display: flex; width: 100%; overflow: hidden; white-space: nowrap; }
+        .scrolling-content { display: inline-block; white-space: nowrap; padding-right: 50px; animation: infinite-scroll 12s linear infinite; }
+        @keyframes infinite-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        
+        /* Dynamic utility classes for nav scroll logic */
+        .nav-with-announcement { top: 38px !important; position: absolute !important; }
+        .nav-fixed-top { top: 0 !important; position: fixed !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="bg-white">
 
     <div id="announcement-bar" class="hidden"></div>
-
     <div class="overlay" id="main-overlay" onclick="closeAllDrawers()"></div>
 
     <div id="chat-modal">
@@ -120,7 +109,6 @@
                 <button onclick="closeChat()"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-slate-50"></div>
-            
             <div class="chat-input-container">
                 <input type="text" id="userReplyInput" class="flex-1 bg-slate-100 border-none p-3 rounded-xl outline-none text-xs" placeholder="Write a reply...">
                 <button onclick="sendReplyBack()" class="bg-blue-600 text-white p-3 rounded-xl min-w-[50px] flex-shrink-0 flex items-center justify-center active:scale-95 transition">
@@ -160,7 +148,7 @@
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <nav id="main-nav" class="glass fixed w-full top-0 z-50 px-4 py-1 border-b border-slate-100">
+    <nav id="main-nav" class="glass fixed w-full top-0 z-[5000] px-4 py-1 border-b border-slate-100">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleMenu()" class="p-2">
@@ -279,42 +267,51 @@
             localStorage.setItem('user_chat_id', userUUID);
         }
 
-        /* --- UPDATED LOGIC: INFINITE LOOP & COLOR SYNC --- */
+        // --- SCROLL LOGIC FOR NAV & ANNOUNCEMENT ---
+        window.onscroll = function() {
+            const nav = document.getElementById('main-nav');
+            const bar = document.getElementById('announcement-bar');
+            if (!bar.classList.contains('hidden')) {
+                if (window.pageYOffset > 38) {
+                    nav.classList.add('nav-fixed-top');
+                    nav.classList.remove('nav-with-announcement');
+                } else {
+                    nav.classList.remove('nav-fixed-top');
+                    nav.classList.add('nav-with-announcement');
+                }
+            } else {
+                nav.style.position = "fixed";
+                nav.style.top = "0";
+            }
+        };
+
         database.ref('announcement_bar').on('value', (snapshot) => {
             const bar = document.getElementById('announcement-bar');
             const nav = document.getElementById('main-nav');
             if(snapshot.exists() && snapshot.val().content.trim() !== "") {
                 const data = snapshot.val();
                 const textColor = data.color || '#ffffff'; 
-                
-                // Content duplicate kiya hai loop seamless rakhne ke liye
                 const content = data.content + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ";
-                
                 bar.innerHTML = `
                     <div class="marquee-container">
                         <div class="scrolling-content" style="color: ${textColor} !important;">
                             ${content}${content}${content}${content}
                         </div>
                     </div>`;
-                
                 bar.classList.remove('hidden');
                 nav.classList.add('nav-with-announcement');
-                // Force update style for color pick fix
-                bar.querySelector('.scrolling-content').style.color = textColor;
             } else {
                 bar.classList.add('hidden');
                 nav.classList.remove('nav-with-announcement');
+                nav.classList.add('nav-fixed-top');
             }
         });
 
         database.ref(`user_chats/${userUUID}`).on('value', (snapshot) => {
             const data = snapshot.val();
             const bell = document.getElementById('bell-container');
-            if (data && data.show_bell === true) {
-                bell.classList.remove('hidden');
-            } else {
-                bell.classList.add('hidden');
-            }
+            if (data && data.show_bell === true) bell.classList.remove('hidden');
+            else bell.classList.add('hidden');
         });
 
         async function openChat() {
@@ -504,4 +501,3 @@
     </script>
 </body>
 </html>
-
