@@ -20,7 +20,6 @@
         .fixed-wa { position: fixed; bottom: 20px; right: 15px; z-index: 9999; background-color: #25D366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,211,102,0.3); animation: floating 3s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         
-        /* FIX: Side menu z-index increased to be above announcement bar */
         #side-cart, #side-menu { position: fixed; top: 0; height: 100%; background: white; z-index: 10000; transition: 0.4s ease-in-out; box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         #side-cart { right: -100%; width: 85%; max-width: 400px; }
         #side-cart.active { right: 0; }
@@ -61,14 +60,14 @@
         
         .premium-text { background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
 
+        /* --- UPDATED BRAND LOGO --- */
         .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
-        .brand-icon { width: 28px; height: 28px; margin-bottom: 1px; }
-        .brand-name { font-size: 13px; font-weight: 900; line-height: 1; display: flex; align-items: center; letter-spacing: -0.5px; }
+        .brand-icon { width: 45px; height: auto; margin-bottom: -2px; } /* Logo size adjusted */
+        .brand-name { font-size: 10px; font-weight: 900; line-height: 1; display: flex; align-items: center; letter-spacing: 0.5px; }
 
         .qty-btn { background: #f1f5f9; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; font-weight: bold; }
         .qty-input { width: 25px; text-align: center; font-size: 12px; font-weight: 700; }
 
-        /* --- UPDATED: POSITION ABSOLUTE TO HIDE ON SCROLL --- */
         #announcement-bar { 
             background: #000000;
             color: white; 
@@ -76,7 +75,7 @@
             padding: 10px 0; 
             font-size: 11px; 
             font-weight: 700; 
-            position: absolute; /* Fixed se Absolute kar diya taake scroll ho kar upar jaye */
+            position: absolute; 
             top: 0; 
             width: 100%; 
             z-index: 100; 
@@ -86,7 +85,6 @@
         .scrolling-content { display: inline-block; white-space: nowrap; padding-right: 50px; animation: infinite-scroll 12s linear infinite; }
         @keyframes infinite-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         
-        /* Dynamic utility classes for nav scroll logic */
         .nav-with-announcement { top: 38px !important; position: absolute !important; }
         .nav-fixed-top { top: 0 !important; position: fixed !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
@@ -157,11 +155,7 @@
             </div>
             <div class="flex justify-center">
                 <a href="#" class="brand-logo">
-                    <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="9" cy="20" r="2" fill="#1e293b"/>
-                        <circle cx="18" cy="20" r="2" fill="#1e293b"/>
-                    </svg>
+                    <img src="https://i.ibb.co/jv8MgrMS/e13258a2b49aef72b89a49f114500d18.jpg" alt="Waleed Store Logo" class="brand-icon">
                     <div class="brand-name">
                         <span class="text-slate-900 uppercase">Waleed</span>
                         <span class="text-blue-600 ml-1 uppercase">Store</span>
@@ -267,7 +261,6 @@
             localStorage.setItem('user_chat_id', userUUID);
         }
 
-        // --- SCROLL LOGIC FOR NAV & ANNOUNCEMENT ---
         window.onscroll = function() {
             const nav = document.getElementById('main-nav');
             const bar = document.getElementById('announcement-bar');
