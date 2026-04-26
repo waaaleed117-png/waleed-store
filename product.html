@@ -11,24 +11,26 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+        body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
         
-        /* Dark Theme Matching your Index */
-        body { font-family: 'Inter', sans-serif; background: #0a0f1c; color: #e2e8f0; overflow-x: hidden; }
-        
-        /* Sidebar Styling from Index */
-        .sidebar { transition: 0.3s; width: 260px; background: #111827; height: 100vh; position: fixed; left: -260px; z-index: 6000; }
+        /* Brand Styles from Admin Layout */
+        .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; gap: 1px; }
+        .brand-icon { width: 38px; height: auto; display: block; margin-bottom: 2px; } 
+        .brand-name { font-size: 11px; font-weight: 900; line-height: 1; display: flex; align-items: center; letter-spacing: -0.2px; white-space: nowrap; }
+
+        /* Sidebar simple styling for consistency */
+        .sidebar { transition: 0.3s; width: 260px; background: #111827; height: 100vh; position: fixed; left: -260px; top: 0; z-index: 9999; color: white; padding: 20px; }
         .sidebar.active { left: 0; }
-        
-        .glass-header { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         .slider-wrapper {
             width: 100%;
             position: relative;
-            border-radius: 1.5rem;
+            border-radius: 2rem;
             overflow: hidden;
-            background: #1e293b;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
         }
 
         .slider-container { 
@@ -53,56 +55,60 @@
         .slide img { max-height: 100%; max-width: 100%; object-fit: contain; }
         .slide iframe { width: 100%; height: 100%; border: none; }
 
-        .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background: #1e293b; flex-shrink: 0; }
-        .thumb-img.active { border-color: #3b82f6; transform: scale(1.05); }
+        .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background: #f1f5f9; flex-shrink: 0; }
+        .thumb-img.active { border-color: #2563eb; transform: scale(1.05); }
         
         .buy-btn { animation: pulse-ring 2s infinite; }
-        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="pt-20">
 
-    <div id="sidebar" class="sidebar border-r border-slate-800 p-6">
+    <div id="sidebar" class="sidebar">
         <div class="flex items-center justify-between mb-10">
             <span class="text-xl font-bold text-blue-500">Waleed Store</span>
             <button onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <nav class="space-y-4">
-            <a href="index.html" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
+            <a href="index.html" class="block p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
                 <i class="fa-solid fa-house"></i> Home
             </a>
-            <a href="checkout.html" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
+            <a href="checkout.html" class="block p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
                 <i class="fa-solid fa-cart-shopping"></i> My Cart
             </a>
         </nav>
     </div>
 
-    <nav class="glass-header fixed w-full top-0 z-[5000] px-4 py-3">
-        <div class="container mx-auto flex items-center justify-between">
-            <button onclick="toggleSidebar()" class="text-xl p-2 bg-slate-800 rounded-lg text-blue-500">
-                <i class="fa-solid fa-bars-staggered"></i>
-            </button>
-
-            <a href="index.html" class="flex flex-col items-center">
-                <img src="https://i.ibb.co/34302/cart-logo.png" alt="Logo" class="w-8 h-8 mb-1">
-                <div class="flex items-center gap-1">
-                    <span class="text-xs font-bold text-white uppercase">Waleed</span>
-                    <span class="text-xs font-bold text-blue-500 uppercase">Store</span>
-                </div>
-            </a>
-
-            <div class="flex items-center">
-                <div class="relative p-2 cursor-pointer" onclick="window.location.href='checkout.html'">
-                    <i class="fa-solid fa-cart-shopping text-xl text-slate-300"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-slate-900 font-bold">0</span>
+    <nav class="glass fixed w-full top-0 z-[5000] px-4 py-1 border-b border-slate-100">
+        <div class="container mx-auto grid grid-cols-3 items-center">
+            <div class="flex justify-start">
+                <button onclick="toggleSidebar()" class="text-2xl p-2 bg-slate-100 rounded-lg text-slate-800">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+            </div>
+            
+            <div class="flex justify-center">
+                <a href="index.html" class="brand-logo">
+                    <img src="https://i.ibb.co/34302/cart-logo.png" alt="Waleed Store Logo" class="brand-icon">
+                    <div class="brand-name">
+                        <span class="text-slate-900 uppercase">Waleed</span>
+                        <span class="text-blue-600 ml-1 uppercase">Store</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="flex justify-end items-center">
+                <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
+                    <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="fixed top-[85px] right-4 z-[4000]">
-        <button onclick="history.back()" class="bg-slate-800 text-slate-400 w-9 h-9 rounded-full flex items-center justify-center shadow-lg border border-slate-700 active:scale-90 transition-transform">
+    <div class="fixed top-[65px] right-4 z-[4500]">
+        <button onclick="history.back()" class="bg-white text-slate-400 w-9 h-9 rounded-full flex items-center justify-center shadow-lg border border-slate-100 active:scale-90 transition-transform">
             <i class="fa-solid fa-xmark text-lg"></i>
         </button>
     </div>
@@ -110,30 +116,34 @@
     <div class="container mx-auto px-4 py-6">
         <div class="mb-6">
             <div class="slider-wrapper">
-                <div id="imageSlider" class="slider-container"></div>
+                <div id="imageSlider" class="slider-container">
+                    </div>
             </div>
-            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-1"></div>
+            <div id="thumbContainer" class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-1">
+            </div>
         </div>
 
         <div class="space-y-4">
             <div class="flex flex-col">
-                <h1 id="pName" class="text-xl font-bold text-white leading-tight">Loading...</h1>
-                <div class="flex items-center gap-3 mt-1">
-                    <span id="pOldPrice" class="text-sm text-slate-500 line-through"></span>
-                    <span id="pPrice" class="text-2xl font-black text-blue-500"></span>
+                <div class="flex justify-between items-start mb-1">
+                    <h1 id="pName" class="text-lg font-bold text-slate-900 leading-tight">Loading...</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="pOldPrice" class="text-xs text-slate-400 line-through"></span>
+                    <span id="pPrice" class="text-xl font-extrabold text-blue-600"></span>
                 </div>
             </div>
 
             <input type="hidden" id="pDeliveryVal" value="200">
             <input type="hidden" id="pCodVal" value="0">
 
-            <div class="py-4 border-t border-slate-800">
-                <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Description</h3>
-                <p id="pDesc" class="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap"></p>
+            <div class="py-4 border-t border-slate-100">
+                <h3 class="text-sm font-bold text-black uppercase tracking-widest mb-2">Description</h3>
+                <p id="pDesc" class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap"></p>
             </div>
 
-            <div class="fixed bottom-0 left-0 w-full p-4 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 flex gap-3 z-40">
-                <button onclick="handleAddToCart()" class="flex-1 bg-slate-800 text-white py-4 rounded-2xl font-bold text-sm border border-slate-700 active:scale-95 transition">Add to Cart</button>
+            <div class="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex gap-3 z-40">
+                <button onclick="handleAddToCart()" class="flex-1 bg-slate-100 text-slate-900 py-4 rounded-2xl font-bold text-sm active:scale-95 transition">Add to Cart</button>
                 <button onclick="handleBuyNow()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm buy-btn active:scale-95 transition shadow-lg shadow-blue-600/20">Buy Now</button>
             </div>
         </div>
@@ -141,7 +151,7 @@
 
     <div class="h-24"></div>
 
-    <footer class="py-10 text-center text-slate-600 text-[9px] bg-slate-900/50 tracking-widest uppercase border-t border-slate-800">
+    <footer class="py-10 text-center text-slate-400 text-[9px] bg-slate-50 tracking-widest uppercase border-t border-slate-100">
         © 2026 WALEED STORE. PREMIUM QUALITY ASSURED.
     </footer>
 
@@ -158,6 +168,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // Sidebar Function
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -243,10 +254,20 @@
             cart.push(item);
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartBadge();
+            alert("Added to cart!");
         }
 
         function handleBuyNow() {
-            handleAddToCart();
+            const pName = document.getElementById('pName').innerText;
+            const pPrice = document.getElementById('pPrice').innerText;
+            const imgElement = document.querySelector('.slide img');
+            const pImg = imgElement ? imgElement.src : "";
+            const pDelivery = document.getElementById('pDeliveryVal').value;
+            const pCod = document.getElementById('pCodVal').value;
+
+            const directItem = [{ name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery, codFee: pCod }];
+            
+            localStorage.setItem('cart', JSON.stringify(directItem));
             window.location.href = 'checkout.html'; 
         }
 
