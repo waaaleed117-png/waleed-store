@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,29 +12,26 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
         body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
         
-        /* Exact Match Header from Main Website */
-        .main-nav { background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 16px; }
-        
-        /* Sidebar Styling */
-        .sidebar { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 280px; background: white; height: 100vh; position: fixed; left: -280px; top: 0; z-index: 9999; box-shadow: 10px 0 30px rgba(0,0,0,0.1); overflow: hidden; }
+        /* Sidebar Styles from Index */
+        .sidebar { transition: 0.3s; width: 260px; background: #111827; height: 100vh; position: fixed; left: -260px; z-index: 6000; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .sidebar.active { left: 0; }
-        .sidebar-header { background: #2563eb; padding: 25px 20px; color: white; display: flex; align-items: center; justify-content: space-between; }
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
-        .overlay.active { display: block; }
+        
+        /* Logo Styles */
+        .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; gap: 1px; }
+        .brand-icon { width: 38px; height: auto; display: block; margin-bottom: 2px; } 
+        .brand-name { font-size: 11px; font-weight: 900; line-height: 1; display: flex; align-items: center; letter-spacing: -0.2px; white-space: nowrap; }
 
-        /* Brand Logo Style */
-        .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
-        .brand-icon { height: 28px; width: auto; object-fit: contain; margin-bottom: 1px; } 
-        .brand-name { font-size: 11px; font-weight: 900; line-height: 1; letter-spacing: -0.2px; white-space: nowrap; text-transform: uppercase; }
-
-        /* Sliders & Other Elements (Untouched) */
         .slider-wrapper { width: 100%; position: relative; border-radius: 2rem; overflow: hidden; background: #f8fafc; border: 1px solid #f1f5f9; }
-        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; aspect-ratio: 1/1; }
+        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; width: 100%; aspect-ratio: 1/1; }
         .slider-container::-webkit-scrollbar { display: none; }
         .slide { flex: 0 0 100%; width: 100%; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; }
         .slide img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .slide iframe { width: 100%; height: 100%; border: none; }
         .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background: #f1f5f9; flex-shrink: 0; }
         .thumb-img.active { border-color: #2563eb; transform: scale(1.05); }
         .buy-btn { animation: pulse-ring 2s infinite; }
@@ -45,53 +41,57 @@
 </head>
 <body class="pt-20">
 
-    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
-
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <span class="text-xl font-bold uppercase tracking-tight">Menu</span>
-            <button onclick="toggleSidebar()" class="text-2xl"><i class="fa-solid fa-xmark"></i></button>
+    <div id="sidebar" class="sidebar border-r border-slate-800 p-6">
+        <div class="flex items-center justify-between mb-10">
+            <div class="flex items-center gap-2">
+                <img src="https://i.ibb.co/MkzmytwF/e13258a2b49aef72b89a49f114500d18.jpg" class="w-8 h-8 rounded-lg">
+                <span class="text-xl font-bold text-blue-500">Waleed Store</span>
+            </div>
+            <button onclick="toggleSidebar()" class="text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <nav class="p-4 space-y-2">
-            <a href="index.html" class="flex items-center gap-4 p-4 text-slate-700 font-bold hover:bg-blue-50 rounded-xl transition">
-                <i class="fa-solid fa-house text-blue-600 w-5"></i> Home
+        <nav class="space-y-4">
+            <a href="index.html" class="block w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
+                <i class="fa-solid fa-house"></i> Home
             </a>
-            <a href="index.html#contact" class="flex items-center gap-4 p-4 text-slate-700 font-bold hover:bg-blue-50 rounded-xl transition">
-                <i class="fa-solid fa-envelope text-blue-600 w-5"></i> Contact Us
-            </a>
+            <button onclick="window.location.href='index.html?section=view-orders'" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3">
+                <i class="fa-solid fa-cart-shopping"></i> My Orders
+            </button>
+            <button onclick="window.location.href='index.html?section=user-messages'" class="w-full text-left p-3 rounded-xl hover:bg-blue-600/10 hover:text-blue-400 transition flex items-center gap-3 relative">
+                <i class="fa-solid fa-comment-dots"></i> Support Chat
+            </button>
         </nav>
     </div>
 
-    <nav class="main-nav fixed w-full top-0 z-[5000]">
+    <nav class="glass fixed w-full top-0 z-[5000] px-4 py-1 border-b border-slate-100">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
-                <button onclick="toggleSidebar()" class="text-2xl p-2 text-white">
-                    <i class="fa-solid fa-bars-staggered"></i>
+                <button onclick="toggleSidebar()" class="p-2 text-blue-600">
+                    <i class="fa-solid fa-bars-staggered text-xl"></i>
                 </button>
             </div>
             
             <div class="flex justify-center">
                 <a href="index.html" class="brand-logo">
-                    <img src="https://i.ibb.co/MkzmytwF/e13258a2b49aef72b89a49f114500d18.jpg" alt="Logo" class="brand-icon">
+                    <img src="https://i.ibb.co/MkzmytwF/e13258a2b49aef72b89a49f114500d18.jpg" alt="Waleed Store Logo" class="brand-icon rounded-full">
                     <div class="brand-name">
-                        <span class="text-white">Waleed</span>
-                        <span class="text-blue-500 ml-0.5">Store</span>
+                        <span class="text-slate-900 uppercase">Waleed</span>
+                        <span class="text-blue-600 ml-1 uppercase">Store</span>
                     </div>
                 </a>
             </div>
             
-            <div class="flex justify-end items-center">
-                <div class="relative p-1 cursor-pointer text-white" onclick="window.location.href='checkout.html'">
-                    <i class="fa-solid fa-cart-shopping text-2xl"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] px-1.5 rounded-full border-2 border-[#0f172a] font-bold">0</span>
+            <div class="flex justify-end items-center gap-3">
+                <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
+                    <i class="fa-solid fa-cart-shopping text-xl text-slate-800"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] px-1.5 rounded-full border border-white font-bold">0</span>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="fixed top-[75px] right-4 z-[4500]">
-        <button onclick="history.back()" class="bg-white/90 backdrop-blur text-slate-400 w-10 h-10 rounded-full flex items-center justify-center shadow-md border border-slate-100 active:scale-90 transition-transform">
-            <i class="fa-solid fa-arrow-left text-lg"></i>
+    <div class="fixed top-[65px] right-4 z-[4500]">
+        <button onclick="history.back()" class="bg-white text-slate-400 w-9 h-9 rounded-full flex items-center justify-center shadow-lg border border-slate-100 active:scale-90 transition-transform">
+            <i class="fa-solid fa-xmark text-lg"></i>
         </button>
     </div>
 
@@ -105,10 +105,12 @@
 
         <div class="space-y-4">
             <div class="flex flex-col">
-                <h1 id="pName" class="text-xl font-bold text-slate-900 leading-tight mb-2">Loading...</h1>
+                <div class="flex justify-between items-start mb-1">
+                    <h1 id="pName" class="text-lg font-bold text-slate-900 leading-tight">Loading...</h1>
+                </div>
                 <div class="flex items-center gap-3">
-                    <span id="pOldPrice" class="text-sm text-slate-400 line-through"></span>
-                    <span id="pPrice" class="text-2xl font-extrabold text-blue-600"></span>
+                    <span id="pOldPrice" class="text-xs text-slate-400 line-through"></span>
+                    <span id="pPrice" class="text-xl font-extrabold text-blue-600"></span>
                 </div>
             </div>
 
@@ -116,11 +118,11 @@
             <input type="hidden" id="pCodVal" value="0">
 
             <div class="py-4 border-t border-slate-100">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Description</h3>
+                <h3 class="text-sm font-bold text-black uppercase tracking-widest mb-2">Description</h3>
                 <p id="pDesc" class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap"></p>
             </div>
 
-            <div class="fixed bottom-0 left-0 w-full p-4 bg-white/90 backdrop-blur-md border-t border-slate-100 flex gap-3 z-40">
+            <div class="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex gap-3 z-40">
                 <button onclick="handleAddToCart()" class="flex-1 bg-slate-100 text-slate-900 py-4 rounded-2xl font-bold text-sm active:scale-95 transition">Add to Cart</button>
                 <button onclick="handleBuyNow()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm buy-btn active:scale-95 transition shadow-lg shadow-blue-600/20">Buy Now</button>
             </div>
@@ -129,8 +131,8 @@
 
     <div class="h-24"></div>
 
-    <footer class="py-10 text-center text-slate-400 text-[10px] bg-slate-50 tracking-widest uppercase border-t border-slate-100">
-        © 2026 WALEED STORE. PREMIUM QUALITY.
+    <footer class="py-10 text-center text-slate-400 text-[9px] bg-slate-50 tracking-widest uppercase border-t border-slate-100">
+        © 2026 WALEED STORE. PREMIUM QUALITY ASSURED.
     </footer>
 
     <script>
@@ -146,9 +148,9 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        function toggleSidebar() { 
-            document.getElementById('sidebar').classList.toggle('active'); 
-            document.getElementById('overlay').classList.toggle('active');
+        // Sidebar Toggle Function
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -160,7 +162,9 @@
                 if (p) {
                     document.getElementById('pName').innerText = p.name;
                     document.getElementById('pPrice').innerText = 'Rs. ' + p.price;
-                    if(p.originalPrice) document.getElementById('pOldPrice').innerText = 'Rs. ' + p.originalPrice;
+                    if(p.originalPrice) {
+                        document.getElementById('pOldPrice').innerText = 'Rs. ' + p.originalPrice;
+                    }
                     document.getElementById('pDesc').innerText = p.desc;
                     document.getElementById('pDeliveryVal').value = p.delivery || "200";
                     document.getElementById('pCodVal').value = p.cod_fee || "0";
@@ -178,13 +182,34 @@
                         const thumb = document.createElement('img');
                         thumb.src = img;
                         thumb.className = `thumb-img ${index === 0 ? 'active' : ''}`;
-                        thumb.onclick = () => { slider.scrollTo({ left: slider.clientWidth * index, behavior: 'smooth' }); };
+                        thumb.onclick = () => {
+                            slider.scrollTo({ left: slider.clientWidth * index, behavior: 'smooth' });
+                        };
                         thumbContainer.appendChild(thumb);
                     });
 
+                    if (p.video) {
+                        const vidId = p.video.includes('v=') ? p.video.split('v=')[1].split('&')[0] : p.video.split('/').pop();
+                        const videoSlide = document.createElement('div');
+                        videoSlide.className = 'slide';
+                        videoSlide.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}" allowfullscreen></iframe>`;
+                        slider.appendChild(videoSlide);
+
+                        const videoThumb = document.createElement('div');
+                        videoThumb.className = 'thumb-img flex items-center justify-center bg-slate-800 text-white';
+                        videoThumb.innerHTML = `<i class="fa-solid fa-play"></i>`;
+                        videoThumb.onclick = () => {
+                            slider.scrollTo({ left: slider.scrollWidth, behavior: 'smooth' });
+                        };
+                        thumbContainer.appendChild(videoThumb);
+                    }
+
                     slider.addEventListener('scroll', () => {
                         const index = Math.round(slider.scrollLeft / slider.clientWidth);
-                        document.querySelectorAll('.thumb-img').forEach((t, i) => t.classList.toggle('active', i === index));
+                        const allThumbs = document.querySelectorAll('.thumb-img');
+                        allThumbs.forEach((t, i) => {
+                            t.classList.toggle('active', i === index);
+                        });
                     });
                 }
             });
@@ -192,14 +217,21 @@
 
         function updateCartBadge() {
             let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-            document.getElementById('cart-count').innerText = currentCart.length;
+            const countElement = document.getElementById('cart-count');
+            if(countElement) {
+                countElement.innerText = currentCart.length;
+            }
         }
 
         function handleAddToCart() {
             const pName = document.getElementById('pName').innerText;
             const pPrice = document.getElementById('pPrice').innerText;
             const imgElement = document.querySelector('.slide img');
-            const item = { name: pName, price: pPrice, img: imgElement ? imgElement.src : "" };
+            const pImg = imgElement ? imgElement.src : "";
+            const pDelivery = document.getElementById('pDeliveryVal').value;
+            const pCod = document.getElementById('pCodVal').value;
+
+            const item = { name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery, codFee: pCod };
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             cart.push(item);
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -208,7 +240,16 @@
         }
 
         function handleBuyNow() {
-            handleAddToCart();
+            const pName = document.getElementById('pName').innerText;
+            const pPrice = document.getElementById('pPrice').innerText;
+            const imgElement = document.querySelector('.slide img');
+            const pImg = imgElement ? imgElement.src : "";
+            const pDelivery = document.getElementById('pDeliveryVal').value;
+            const pCod = document.getElementById('pCodVal').value;
+
+            const directItem = [{ name: pName, price: pPrice, img: pImg, deliveryCharges: pDelivery, codFee: pCod }];
+            
+            localStorage.setItem('cart', JSON.stringify(directItem));
             window.location.href = 'checkout.html'; 
         }
 
