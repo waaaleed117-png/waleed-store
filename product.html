@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,22 +15,22 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
         body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
         
-        /* Exact Match Header from Main Website Image */
-        .main-nav { background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        /* Exact Match Header from Main Website */
+        .main-nav { background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 16px; }
         
-        /* Sidebar Styling (Matched with Screenshot) */
+        /* Sidebar Styling */
         .sidebar { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 280px; background: white; height: 100vh; position: fixed; left: -280px; top: 0; z-index: 9999; box-shadow: 10px 0 30px rgba(0,0,0,0.1); overflow: hidden; }
         .sidebar.active { left: 0; }
         .sidebar-header { background: #2563eb; padding: 25px 20px; color: white; display: flex; align-items: center; justify-content: space-between; }
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
         .overlay.active { display: block; }
 
-        /* Brand Logo Centering & Style */
+        /* Brand Logo Style */
         .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
         .brand-icon { height: 28px; width: auto; object-fit: contain; margin-bottom: 1px; } 
         .brand-name { font-size: 11px; font-weight: 900; line-height: 1; letter-spacing: -0.2px; white-space: nowrap; text-transform: uppercase; }
 
-        /* Sliders & Other Elements (Untouched as requested) */
+        /* Sliders & Other Elements (Untouched) */
         .slider-wrapper { width: 100%; position: relative; border-radius: 2rem; overflow: hidden; background: #f8fafc; border: 1px solid #f1f5f9; }
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; aspect-ratio: 1/1; }
         .slider-container::-webkit-scrollbar { display: none; }
@@ -61,7 +62,7 @@
         </nav>
     </div>
 
-    <nav class="main-nav fixed w-full top-0 z-[5000] px-4 py-2">
+    <nav class="main-nav fixed w-full top-0 z-[5000]">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
                 <button onclick="toggleSidebar()" class="text-2xl p-2 text-white">
@@ -71,7 +72,7 @@
             
             <div class="flex justify-center">
                 <a href="index.html" class="brand-logo">
-                    <img src="https://i.ibb.co/MkzmytwF/e13258a2b49aef72b89a49f114500d18.jpg" alt="Waleed Store Logo" class="brand-icon">
+                    <img src="https://i.ibb.co/MkzmytwF/e13258a2b49aef72b89a49f114500d18.jpg" alt="Logo" class="brand-icon">
                     <div class="brand-name">
                         <span class="text-white">Waleed</span>
                         <span class="text-blue-500 ml-0.5">Store</span>
@@ -80,8 +81,8 @@
             </div>
             
             <div class="flex justify-end items-center">
-                <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
-                    <i class="fa-solid fa-cart-shopping text-2xl text-white"></i>
+                <div class="relative p-1 cursor-pointer text-white" onclick="window.location.href='checkout.html'">
+                    <i class="fa-solid fa-cart-shopping text-2xl"></i>
                     <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] px-1.5 rounded-full border-2 border-[#0f172a] font-bold">0</span>
                 </div>
             </div>
