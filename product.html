@@ -13,7 +13,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
         body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
+        
+        /* Exact Match Header from Main Website Image */
+        .main-nav { background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); }
         
         /* Sidebar Styling (Matched with Screenshot) */
         .sidebar { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 280px; background: white; height: 100vh; position: fixed; left: -280px; top: 0; z-index: 9999; box-shadow: 10px 0 30px rgba(0,0,0,0.1); overflow: hidden; }
@@ -22,12 +24,12 @@
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
         .overlay.active { display: block; }
 
-        /* Brand Logo Centering */
+        /* Brand Logo Centering & Style */
         .brand-logo { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
-        .brand-icon { height: 32px; width: auto; object-fit: contain; margin-bottom: 2px; } 
-        .brand-name { font-size: 10px; font-weight: 900; line-height: 1; letter-spacing: -0.2px; white-space: nowrap; text-transform: uppercase; }
+        .brand-icon { height: 28px; width: auto; object-fit: contain; margin-bottom: 1px; } 
+        .brand-name { font-size: 11px; font-weight: 900; line-height: 1; letter-spacing: -0.2px; white-space: nowrap; text-transform: uppercase; }
 
-        /* Existing Styles (No changes) */
+        /* Sliders & Other Elements (Untouched as requested) */
         .slider-wrapper { width: 100%; position: relative; border-radius: 2rem; overflow: hidden; background: #f8fafc; border: 1px solid #f1f5f9; }
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; aspect-ratio: 1/1; }
         .slider-container::-webkit-scrollbar { display: none; }
@@ -46,41 +48,41 @@
 
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <span class="text-xl font-bold">Menu</span>
+            <span class="text-xl font-bold uppercase tracking-tight">Menu</span>
             <button onclick="toggleSidebar()" class="text-2xl"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <nav class="p-4 space-y-2">
             <a href="index.html" class="flex items-center gap-4 p-4 text-slate-700 font-bold hover:bg-blue-50 rounded-xl transition">
                 <i class="fa-solid fa-house text-blue-600 w-5"></i> Home
             </a>
-            <a href="#" class="flex items-center gap-4 p-4 text-slate-700 font-bold hover:bg-blue-50 rounded-xl transition">
+            <a href="index.html#contact" class="flex items-center gap-4 p-4 text-slate-700 font-bold hover:bg-blue-50 rounded-xl transition">
                 <i class="fa-solid fa-envelope text-blue-600 w-5"></i> Contact Us
             </a>
         </nav>
     </div>
 
-    <nav class="glass fixed w-full top-0 z-[5000] px-4 py-2 border-b border-slate-100">
+    <nav class="main-nav fixed w-full top-0 z-[5000] px-4 py-2">
         <div class="container mx-auto grid grid-cols-3 items-center">
             <div class="flex justify-start">
-                <button onclick="toggleSidebar()" class="text-2xl p-2 text-blue-900">
+                <button onclick="toggleSidebar()" class="text-2xl p-2 text-white">
                     <i class="fa-solid fa-bars-staggered"></i>
                 </button>
             </div>
             
             <div class="flex justify-center">
                 <a href="index.html" class="brand-logo">
-                    <img src="https://i.ibb.co/m5ZzWp7/logo.png" alt="Waleed Store Logo" class="brand-icon">
+                    <img src="https://i.ibb.co/MkzmytwF/e13258a2b49aef72b89a49f114500d18.jpg" alt="Waleed Store Logo" class="brand-icon">
                     <div class="brand-name">
-                        <span class="text-slate-900">Waleed</span>
-                        <span class="text-blue-600 ml-0.5">Store</span>
+                        <span class="text-white">Waleed</span>
+                        <span class="text-blue-500 ml-0.5">Store</span>
                     </div>
                 </a>
             </div>
             
             <div class="flex justify-end items-center">
                 <div class="relative p-1 cursor-pointer" onclick="window.location.href='checkout.html'">
-                    <i class="fa-solid fa-cart-shopping text-2xl text-slate-800"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] px-1.5 rounded-full border-2 border-white font-bold">0</span>
+                    <i class="fa-solid fa-cart-shopping text-2xl text-white"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] px-1.5 rounded-full border-2 border-[#0f172a] font-bold">0</span>
                 </div>
             </div>
         </div>
@@ -143,7 +145,6 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Sidebar Toggle with Overlay
         function toggleSidebar() { 
             document.getElementById('sidebar').classList.toggle('active'); 
             document.getElementById('overlay').classList.toggle('active');
