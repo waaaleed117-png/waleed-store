@@ -13,7 +13,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
         
-        body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; }
+        /* Fixed scroll issue on body */
+        body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #0f172a; overflow-x: hidden; width: 100%; position: relative; }
         
         /* Header Fix */
         .main-nav { height: 60px; background: white; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; padding: 0 15px; position: fixed; top: 0; width: 100%; z-index: 5000; }
@@ -24,12 +25,12 @@
         .brand-text { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; line-height: 1; margin-top: 2px; }
 
         /* Sidebar Style */
-        .sidebar { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 80%; max-width: 300px; background: white; height: 100vh; position: fixed; left: -100%; top: 0; z-index: 6000; }
+        .sidebar { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 80%; max-width: 300px; background: white; height: 100vh; position: fixed; left: -110%; top: 0; z-index: 6000; }
         .sidebar.active { left: 0; }
         .sidebar-header { background: #2563eb; color: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 18px; }
         
-        /* Cart Drawer (Restored to 85% width) */
-        .cart-drawer { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 85%; max-width: 350px; background: white; height: 100vh; position: fixed; right: -100%; top: 0; z-index: 6000; display: flex; flex-direction: column; box-shadow: -5px 0 25px rgba(0,0,0,0.1); }
+        /* Cart Drawer FIXED: Width 85% and proper positioning to prevent scrolling */
+        .cart-drawer { transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 85%; max-width: 350px; background: white; height: 100vh; position: fixed; right: -110%; top: 0; z-index: 6000; display: flex; flex-direction: column; box-shadow: -5px 0 25px rgba(0,0,0,0.1); }
         .cart-drawer.active { right: 0; }
         .cart-header { padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; }
 
@@ -153,9 +154,13 @@
         }
 
         function toggleCart() {
-            document.getElementById('cartDrawer').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
-            renderCart();
+            const cart = document.getElementById('cartDrawer');
+            const overlay = document.getElementById('overlay');
+            cart.classList.toggle('active');
+            overlay.classList.toggle('active');
+            if(cart.classList.contains('active')) {
+                renderCart();
+            }
         }
 
         function closeAll() {
